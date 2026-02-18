@@ -870,6 +870,7 @@ function updateStats() {
 
 function saveRatings() {
   localStorage.setItem('dsb2-flashcard-ratings', JSON.stringify(ratings));
+  showBackupReminder();
 }
 
 function loadRatings() {
@@ -1038,6 +1039,39 @@ function loadUserCards() {
 
 function saveUserCards() {
   localStorage.setItem('dsb2-flashcard-custom', JSON.stringify(ALL_CARDS));
+  showBackupReminder();
+}
+
+let _hasUnsavedEdits = false;
+function showBackupReminder() {
+  _hasUnsavedEdits = true;
+  let banner = document.getElementById('backup-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'backup-banner';
+    banner.style.cssText = 'background:#713f12;color:#fde68a;padding:8px 16px;text-align:center;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:12px;';
+    banner.innerHTML = 'You have unsaved card edits. <button onclick="exportFullBackup()" style="background:#fbbf24;color:#1e293b;border:none;padding:4px 14px;border-radius:6px;cursor:pointer;font-weight:600;font-size:0.85rem">Save Backup</button>';
+    document.body.insertBefore(banner, document.body.children[1]);
+  }
+  banner.style.display = 'flex';
+}
+
+function exportFullBackup() {
+  const backup = {
+    cards: ALL_CARDS,
+    ratings: ratings,
+    stars: stars
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flashcards_backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  _hasUnsavedEdits = false;
+  const banner = document.getElementById('backup-banner');
+  if (banner) banner.style.display = 'none';
 }
 
 function getTopics() {
@@ -1189,9 +1223,28 @@ function importCards(event) {
   reader.onload = function(e) {
     try {
       const imported = JSON.parse(e.target.result);
-      if (!Array.isArray(imported)) throw new Error('Not an array');
-      const valid = imported.every(c => c.question && c.answer && c.topic);
-      if (!valid) throw new Error('Cards must have question, answer, topic');
+
+      // Handle full backup format { cards, ratings, stars }
+      if (imported.cards && Array.isArray(imported.cards)) {
+        const valid = imported.cards.every(c => (c.question || c.image) && c.answer && c.topic);
+        if (!valid) throw new Error('Cards must have question/image, answer, topic');
+        if (confirm(`Import backup: ${imported.cards.length} cards (+ ratings & stars)? This will REPLACE everything.`)) {
+          ALL_CARDS = imported.cards;
+          if (imported.ratings) { ratings = imported.ratings; localStorage.setItem('dsb2-flashcard-ratings', JSON.stringify(ratings)); }
+          if (imported.stars) { stars = imported.stars; localStorage.setItem('dsb2-flashcard-stars', JSON.stringify(stars)); }
+          saveUserCards();
+          rebuildApp();
+          closeManageModal();
+          const banner = document.getElementById('backup-banner');
+          if (banner) banner.style.display = 'none';
+        }
+        return;
+      }
+
+      // Handle plain array format
+      if (!Array.isArray(imported)) throw new Error('Not an array or backup object');
+      const valid = imported.every(c => (c.question || c.image) && c.answer && c.topic);
+      if (!valid) throw new Error('Cards must have question/image, answer, topic');
       if (confirm(`Import ${imported.length} cards? This will REPLACE all current cards.`)) {
         ALL_CARDS = imported;
         saveUserCards();
