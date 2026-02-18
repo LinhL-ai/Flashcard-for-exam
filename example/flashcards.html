@@ -42,6 +42,7 @@
   .stat-badge.amber { background: #713f12; color: #fbbf24; }
   .stat-badge.red { background: #7f1d1d; color: #f87171; }
   .stat-badge.star { background: #713f12; color: #fbbf24; }
+  .stat-badge.note { background: #1e3a5f; color: #7dd3fc; }
 
   .star-btn {
     position: absolute;
@@ -61,6 +62,56 @@
   }
   .star-btn:hover { color: #fbbf24; transform: translateX(-50%) scale(1.15); }
   .star-btn.starred { color: #fbbf24; }
+
+  .note-btn {
+    position: absolute;
+    top: 16px;
+    left: calc(50% + 36px);
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #475569;
+    transition: all 0.2s;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    z-index: 1;
+    white-space: nowrap;
+  }
+  .note-btn:hover { color: #7dd3fc; transform: scale(1.1); }
+  .note-btn.has-note { color: #7dd3fc; }
+
+  .note-area {
+    width: 100%;
+    max-width: 700px;
+    background: #1e293b;
+    border: 1px solid #2563eb;
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: none;
+  }
+  .note-area.visible { display: block; }
+  .note-area-header {
+    font-size: 0.78rem;
+    color: #7dd3fc;
+    margin-bottom: 6px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .note-area textarea {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    font-family: inherit;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 70px;
+  }
+  .note-area textarea:focus { outline: none; border-color: #60a5fa; }
 
   .controls {
     background: #1e293b;
@@ -494,6 +545,7 @@
     <span class="stat-badge amber" id="medium-count">Medium: 0</span>
     <span class="stat-badge red" id="hard-count">Hard: 0</span>
     <span class="stat-badge star" id="star-count">&#9733; 0</span>
+    <span class="stat-badge note" id="note-count">&#128221; 0</span>
   </div>
 </header>
 
@@ -513,6 +565,7 @@
         <div class="card-text" id="card-question"></div>
         <div class="flip-hint">Click or press Space to flip</div>
         <button class="star-btn" id="star-btn" onclick="event.stopPropagation(); toggleStar()" title="Star this card (F)">&#9734;</button>
+        <button class="note-btn" id="note-btn" onclick="event.stopPropagation(); toggleNoteArea()" title="Note (N)">&#128221; Note</button>
         <button class="edit-card-btn" onclick="event.stopPropagation(); editCurrentCard()">Edit</button>
       </div>
       <div class="card-face card-back">
@@ -530,6 +583,11 @@
     <button class="conf-btn easy" onclick="rateCard('easy')">Easy (3)</button>
   </div>
 
+  <div class="note-area" id="note-area">
+    <div class="note-area-header">&#128221; My Note</div>
+    <textarea id="note-textarea" placeholder="Add your notes for this card..." oninput="saveNote()"></textarea>
+  </div>
+
   <!-- Quiz mode elements (hidden by default) -->
   <textarea class="quiz-input" id="quiz-input" placeholder="Type your answer here..." style="display:none"></textarea>
   <button class="quiz-submit" id="quiz-submit" onclick="checkQuizAnswer()" style="display:none">Check Answer</button>
@@ -543,7 +601,7 @@
 
   <div class="keyboard-hints">
     <kbd>Space</kbd> Flip &nbsp; <kbd>&larr;</kbd> Prev &nbsp; <kbd>&rarr;</kbd> Next &nbsp;
-    <kbd>1</kbd> Hard &nbsp; <kbd>2</kbd> Medium &nbsp; <kbd>3</kbd> Easy &nbsp; <kbd>F</kbd> Star &nbsp; <kbd>S</kbd> Shuffle
+    <kbd>1</kbd> Hard &nbsp; <kbd>2</kbd> Medium &nbsp; <kbd>3</kbd> Easy &nbsp; <kbd>F</kbd> Star &nbsp; <kbd>N</kbd> Note &nbsp; <kbd>S</kbd> Shuffle
   </div>
 </div>
 
@@ -602,6 +660,7 @@ let isFlipped = false;
 let mode = 'flashcard'; // 'flashcard' or 'quiz'
 let ratings = {}; // cardKey -> 'easy'|'medium'|'hard'
 let stars = {};   // cardKey -> true
+let notes = {};   // cardKey -> string
 let activeTopic = null;
 
 function loadCards() {
@@ -638,6 +697,15 @@ function buildTopicButtons() {
   starBtn.style.color = '#fbbf24';
   starBtn.onclick = () => filterByRating('starred');
   container.appendChild(starBtn);
+  // Has Notes button
+  const notesBtn = document.createElement('button');
+  notesBtn.className = 'topic-btn';
+  notesBtn.id = 'filter-notes';
+  notesBtn.textContent = '\uD83D\uDCCB Has Notes';
+  notesBtn.style.borderColor = '#7dd3fc';
+  notesBtn.style.color = '#7dd3fc';
+  notesBtn.onclick = () => filterByRating('notes');
+  container.appendChild(notesBtn);
   // Unrated button
   const unratedBtn = document.createElement('button');
   unratedBtn.className = 'topic-btn';
@@ -699,6 +767,8 @@ function filterByRating(rating) {
     cards = ALL_CARDS.filter(c => stars[getCardKey(c)]);
   } else if (rating === 'hard') {
     cards = ALL_CARDS.filter(c => ratings[getCardKey(c)] === 'hard');
+  } else if (rating === 'notes') {
+    cards = ALL_CARDS.filter(c => notes[getCardKey(c)]);
   } else if (rating === 'unrated') {
     cards = ALL_CARDS.filter(c => !ratings[getCardKey(c)]);
   }
@@ -714,6 +784,7 @@ function updateTopicButtons() {
   if (activeTopic === null) btns[0].classList.add('active');
   else if (activeTopic === 'starred') document.getElementById('filter-starred').classList.add('active');
   else if (activeTopic === 'hard') document.getElementById('filter-hard').classList.add('active');
+  else if (activeTopic === 'notes') document.getElementById('filter-notes').classList.add('active');
   else if (activeTopic === 'unrated') document.getElementById('filter-unrated').classList.add('active');
   else {
     btns.forEach(btn => {
@@ -792,6 +863,17 @@ function renderCard() {
     document.querySelector('.card-front').style.borderColor = '#475569';
   }
 
+  // Update note area
+  const noteTextarea = document.getElementById('note-textarea');
+  noteTextarea.value = notes[key] || '';
+  // Hide note area when navigating (keep visible only if already open)
+  if (!noteAreaVisible) {
+    document.getElementById('note-area').classList.remove('visible');
+  } else {
+    document.getElementById('note-area').classList.add('visible');
+  }
+  updateNoteBtn();
+
   // Update star button
   const starEl = document.getElementById('star-btn');
   if (stars[key]) {
@@ -861,11 +943,13 @@ function updateStats() {
     else if (r === 'hard') hard++;
   });
   const starred = ALL_CARDS.filter(c => stars[getCardKey(c)]).length;
+  const noted = ALL_CARDS.filter(c => notes[getCardKey(c)]).length;
   document.getElementById('total-count').textContent = `${total} cards`;
   document.getElementById('easy-count').textContent = `Easy: ${easy}`;
   document.getElementById('medium-count').textContent = `Medium: ${medium}`;
   document.getElementById('hard-count').textContent = `Hard: ${hard}`;
   document.getElementById('star-count').innerHTML = `&#9733; ${starred}`;
+  document.getElementById('note-count').innerHTML = `&#128221; ${noted}`;
 }
 
 function saveRatings() {
@@ -878,6 +962,8 @@ function loadRatings() {
   if (saved) ratings = JSON.parse(saved);
   const savedStars = localStorage.getItem('dsb2-flashcard-stars');
   if (savedStars) stars = JSON.parse(savedStars);
+  const savedNotes = localStorage.getItem('dsb2-flashcard-notes');
+  if (savedNotes) notes = JSON.parse(savedNotes);
 }
 
 function toggleStar() {
@@ -892,6 +978,44 @@ function toggleStar() {
   localStorage.setItem('dsb2-flashcard-stars', JSON.stringify(stars));
   renderCard();
   updateStats();
+}
+
+let noteAreaVisible = false;
+
+function toggleNoteArea() {
+  if (cards.length === 0) return;
+  noteAreaVisible = !noteAreaVisible;
+  const noteArea = document.getElementById('note-area');
+  noteArea.classList.toggle('visible', noteAreaVisible);
+  if (noteAreaVisible) {
+    document.getElementById('note-textarea').focus();
+  }
+}
+
+function saveNote() {
+  if (cards.length === 0) return;
+  const card = cards[currentIndex];
+  const key = getCardKey(card);
+  const val = document.getElementById('note-textarea').value;
+  if (val.trim()) {
+    notes[key] = val;
+  } else {
+    delete notes[key];
+  }
+  localStorage.setItem('dsb2-flashcard-notes', JSON.stringify(notes));
+  updateNoteBtn();
+  updateStats();
+}
+
+function updateNoteBtn() {
+  if (cards.length === 0) return;
+  const key = getCardKey(cards[currentIndex]);
+  const btn = document.getElementById('note-btn');
+  if (notes[key]) {
+    btn.classList.add('has-note');
+  } else {
+    btn.classList.remove('has-note');
+  }
 }
 
 function toggleMode() {
@@ -1060,7 +1184,8 @@ function exportFullBackup() {
   const backup = {
     cards: ALL_CARDS,
     ratings: ratings,
-    stars: stars
+    stars: stars,
+    notes: notes
   };
   const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -1232,6 +1357,7 @@ function importCards(event) {
           ALL_CARDS = imported.cards;
           if (imported.ratings) { ratings = imported.ratings; localStorage.setItem('dsb2-flashcard-ratings', JSON.stringify(ratings)); }
           if (imported.stars) { stars = imported.stars; localStorage.setItem('dsb2-flashcard-stars', JSON.stringify(stars)); }
+          if (imported.notes) { notes = imported.notes; localStorage.setItem('dsb2-flashcard-notes', JSON.stringify(notes)); }
           saveUserCards();
           rebuildApp();
           closeManageModal();
@@ -1308,6 +1434,10 @@ document.addEventListener('keydown', (e) => {
     case 'f':
     case 'F':
       toggleStar();
+      break;
+    case 'n':
+    case 'N':
+      toggleNoteArea();
       break;
     case 's':
     case 'S':
