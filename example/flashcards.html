@@ -396,6 +396,65 @@
   }
   .manage-search:focus { outline: none; border-color: #60a5fa; }
 
+  /* Image paste zone */
+  .image-paste-zone {
+    width: 100%;
+    min-height: 80px;
+    border: 2px dashed #475569;
+    border-radius: 8px;
+    background: #0f172a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .image-paste-zone:hover, .image-paste-zone.dragover {
+    border-color: #60a5fa;
+    background: #1e293b;
+  }
+  .image-paste-zone .placeholder {
+    color: #64748b;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 16px;
+  }
+  .image-paste-zone img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 6px;
+  }
+  .image-paste-zone .remove-img {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .image-paste-zone .remove-img:hover { background: #b91c1c; }
+
+  /* Card image display */
+  .card-image {
+    max-width: 90%;
+    max-height: 180px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    object-fit: contain;
+  }
+
   @media (max-width: 640px) {
     .card-face { padding: 24px 20px; }
     .card-front .card-text { font-size: 1.1rem; }
@@ -474,6 +533,11 @@
     <label>Topic</label>
     <select id="edit-topic"></select>
     <input type="text" id="edit-topic-custom" placeholder="Or type a new topic..." style="margin-top:6px">
+    <label>Question Image (paste from clipboard, drag & drop, or click to upload)</label>
+    <div class="image-paste-zone" id="edit-image-zone" tabindex="0">
+      <div class="placeholder" id="edit-image-placeholder">Ctrl+V to paste &bull; drag image here &bull; or click to browse</div>
+      <input type="file" id="edit-image-file" accept="image/*" style="display:none">
+    </div>
     <label>Question</label>
     <textarea id="edit-question" rows="3"></textarea>
     <label>Answer</label>
@@ -636,7 +700,14 @@ function renderCard() {
   }
   document.getElementById('flashcard-container').style.display = 'block';
   const card = cards[currentIndex];
-  document.getElementById('card-question').textContent = card.question;
+  // Render question with optional image
+  const qEl = document.getElementById('card-question');
+  if (card.image) {
+    qEl.innerHTML = `<img class="card-image" src="${card.image}" alt="Question image">` +
+      (card.question ? `<div>${escHtml(card.question)}</div>` : '');
+  } else {
+    qEl.textContent = card.question;
+  }
   document.getElementById('card-answer').textContent = card.answer;
   document.getElementById('card-topic').textContent = card.topic;
   document.getElementById('card-topic-back').textContent = card.topic;
@@ -794,6 +865,104 @@ function checkQuizAnswer() {
   document.getElementById('confidence-buttons').style.display = 'flex';
 }
 
+// ==================== HELPERS ====================
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ==================== IMAGE HANDLING ====================
+let editImageData = null; // base64 data URL for current edit
+
+function initImageZone() {
+  const zone = document.getElementById('edit-image-zone');
+  const fileInput = document.getElementById('edit-image-file');
+
+  // Click to browse
+  zone.addEventListener('click', (e) => {
+    if (e.target.classList.contains('remove-img')) return;
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files[0]) readImageFile(e.target.files[0]);
+  });
+
+  // Paste anywhere in the modal
+  zone.addEventListener('paste', handleImagePaste);
+  // Also listen on the whole edit modal for paste convenience
+  document.getElementById('edit-modal').addEventListener('paste', handleImagePaste);
+
+  // Drag & drop
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) readImageFile(file);
+  });
+}
+
+function handleImagePaste(e) {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+      readImageFile(item.getAsFile());
+      return;
+    }
+  }
+}
+
+function readImageFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    editImageData = e.target.result;
+    renderImagePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderImagePreview() {
+  const zone = document.getElementById('edit-image-zone');
+  const placeholder = document.getElementById('edit-image-placeholder');
+  if (editImageData) {
+    placeholder.style.display = 'none';
+    // Remove old preview
+    const oldImg = zone.querySelector('img');
+    if (oldImg) oldImg.remove();
+    const oldBtn = zone.querySelector('.remove-img');
+    if (oldBtn) oldBtn.remove();
+    // Add image
+    const img = document.createElement('img');
+    img.src = editImageData;
+    zone.appendChild(img);
+    // Add remove button
+    const btn = document.createElement('button');
+    btn.className = 'remove-img';
+    btn.textContent = '\u00d7';
+    btn.title = 'Remove image';
+    btn.onclick = (e) => { e.stopPropagation(); clearImagePreview(); };
+    zone.appendChild(btn);
+  } else {
+    clearImagePreview();
+  }
+}
+
+function clearImagePreview() {
+  editImageData = null;
+  const zone = document.getElementById('edit-image-zone');
+  const placeholder = document.getElementById('edit-image-placeholder');
+  const oldImg = zone.querySelector('img');
+  if (oldImg) oldImg.remove();
+  const oldBtn = zone.querySelector('.remove-img');
+  if (oldBtn) oldBtn.remove();
+  placeholder.style.display = 'block';
+}
+
 // ==================== CARD EDITOR ====================
 
 // On startup, load user edits from localStorage over the default data
@@ -837,12 +1006,16 @@ function openEditModal(index) {
     document.getElementById('edit-answer').value = card.answer;
     document.getElementById('edit-topic').value = card.topic;
     document.getElementById('edit-delete-btn').style.display = 'inline-block';
+    // Load image if present
+    editImageData = card.image || null;
+    renderImagePreview();
   } else {
     // Add new
     document.getElementById('edit-modal-title').textContent = 'Add New Flashcard';
     document.getElementById('edit-question').value = '';
     document.getElementById('edit-answer').value = '';
     document.getElementById('edit-delete-btn').style.display = 'none';
+    clearImagePreview();
   }
   modal.classList.add('open');
 }
@@ -858,17 +1031,18 @@ function saveEditCard() {
   const question = document.getElementById('edit-question').value.trim();
   const answer = document.getElementById('edit-answer').value.trim();
 
-  if (!question || !answer || !topic) {
-    alert('Please fill in all fields (topic, question, answer).');
+  if ((!question && !editImageData) || !answer || !topic) {
+    alert('Please fill in topic, answer, and either a question or an image.');
     return;
   }
 
+  const cardObj = { question, answer, topic };
+  if (editImageData) cardObj.image = editImageData;
+
   if (index >= 0) {
-    // Update existing
-    ALL_CARDS[index] = { question, answer, topic };
+    ALL_CARDS[index] = cardObj;
   } else {
-    // Add new
-    ALL_CARDS.push({ question, answer, topic });
+    ALL_CARDS.push(cardObj);
   }
 
   saveUserCards();
@@ -912,9 +1086,10 @@ function renderManageList() {
     if (query && !card.question.toLowerCase().includes(query) && !card.topic.toLowerCase().includes(query) && !card.answer.toLowerCase().includes(query)) return;
     const div = document.createElement('div');
     div.className = 'card-list-item';
+    const imgIcon = card.image ? '<span style="color:#fbbf24;margin-right:4px" title="Has image">&#128247;</span>' : '';
     div.innerHTML = `
-      <span class="card-list-q" title="${card.question}">${card.question}</span>
-      <span class="card-list-topic">${card.topic}</span>
+      <span class="card-list-q" title="${escHtml(card.question)}">${imgIcon}${escHtml(card.question || '(image only)')}</span>
+      <span class="card-list-topic">${escHtml(card.topic)}</span>
       <span class="card-list-actions">
         <button class="edit-btn" onclick="closeManageModal(); openEditModal(${i})">Edit</button>
         <button class="del-btn" onclick="deleteFromManage(${i})">Del</button>
@@ -1023,6 +1198,7 @@ document.addEventListener('keydown', (e) => {
 
 // Init
 loadCards();
+initImageZone();
 </script>
 </body>
 </html>
