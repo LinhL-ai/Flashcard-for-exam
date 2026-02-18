@@ -41,6 +41,26 @@
   .stat-badge.green { background: #166534; color: #4ade80; }
   .stat-badge.amber { background: #713f12; color: #fbbf24; }
   .stat-badge.red { background: #7f1d1d; color: #f87171; }
+  .stat-badge.star { background: #713f12; color: #fbbf24; }
+
+  .star-btn {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #475569;
+    transition: all 0.2s;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    z-index: 1;
+  }
+  .star-btn:hover { color: #fbbf24; transform: translateX(-50%) scale(1.15); }
+  .star-btn.starred { color: #fbbf24; }
 
   .controls {
     background: #1e293b;
@@ -473,6 +493,7 @@
     <span class="stat-badge green" id="easy-count">Easy: 0</span>
     <span class="stat-badge amber" id="medium-count">Medium: 0</span>
     <span class="stat-badge red" id="hard-count">Hard: 0</span>
+    <span class="stat-badge star" id="star-count">&#9733; 0</span>
   </div>
 </header>
 
@@ -491,6 +512,7 @@
         <div class="card-topic" id="card-topic"></div>
         <div class="card-text" id="card-question"></div>
         <div class="flip-hint">Click or press Space to flip</div>
+        <button class="star-btn" id="star-btn" onclick="event.stopPropagation(); toggleStar()" title="Star this card (F)">&#9734;</button>
         <button class="edit-card-btn" onclick="event.stopPropagation(); editCurrentCard()">Edit</button>
       </div>
       <div class="card-face card-back">
@@ -521,7 +543,7 @@
 
   <div class="keyboard-hints">
     <kbd>Space</kbd> Flip &nbsp; <kbd>&larr;</kbd> Prev &nbsp; <kbd>&rarr;</kbd> Next &nbsp;
-    <kbd>1</kbd> Hard &nbsp; <kbd>2</kbd> Medium &nbsp; <kbd>3</kbd> Easy &nbsp; <kbd>S</kbd> Shuffle
+    <kbd>1</kbd> Hard &nbsp; <kbd>2</kbd> Medium &nbsp; <kbd>3</kbd> Easy &nbsp; <kbd>F</kbd> Star &nbsp; <kbd>S</kbd> Shuffle
   </div>
 </div>
 
@@ -578,7 +600,8 @@ let cards = [];
 let currentIndex = 0;
 let isFlipped = false;
 let mode = 'flashcard'; // 'flashcard' or 'quiz'
-let ratings = {}; // cardIndex -> 'easy'|'medium'|'hard'
+let ratings = {}; // cardKey -> 'easy'|'medium'|'hard'
+let stars = {};   // cardKey -> true
 let activeTopic = null;
 
 function loadCards() {
@@ -606,6 +629,15 @@ function buildTopicButtons() {
   hardBtn.textContent = 'Hard Only';
   hardBtn.onclick = () => filterByRating('hard');
   container.appendChild(hardBtn);
+  // Starred button
+  const starBtn = document.createElement('button');
+  starBtn.className = 'topic-btn';
+  starBtn.id = 'filter-starred';
+  starBtn.textContent = '\u2605 Starred';
+  starBtn.style.borderColor = '#fbbf24';
+  starBtn.style.color = '#fbbf24';
+  starBtn.onclick = () => filterByRating('starred');
+  container.appendChild(starBtn);
   // Unrated button
   const unratedBtn = document.createElement('button');
   unratedBtn.className = 'topic-btn';
@@ -663,10 +695,12 @@ function filterTopic(topic) {
 
 function filterByRating(rating) {
   activeTopic = rating;
-  if (rating === 'hard') {
-    cards = ALL_CARDS.filter((c, i) => ratings[getCardKey(c)] === 'hard');
+  if (rating === 'starred') {
+    cards = ALL_CARDS.filter(c => stars[getCardKey(c)]);
+  } else if (rating === 'hard') {
+    cards = ALL_CARDS.filter(c => ratings[getCardKey(c)] === 'hard');
   } else if (rating === 'unrated') {
-    cards = ALL_CARDS.filter((c, i) => !ratings[getCardKey(c)]);
+    cards = ALL_CARDS.filter(c => !ratings[getCardKey(c)]);
   }
   currentIndex = 0;
   isFlipped = false;
@@ -678,6 +712,7 @@ function updateTopicButtons() {
   document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
   const btns = document.querySelectorAll('.topic-btn');
   if (activeTopic === null) btns[0].classList.add('active');
+  else if (activeTopic === 'starred') document.getElementById('filter-starred').classList.add('active');
   else if (activeTopic === 'hard') document.getElementById('filter-hard').classList.add('active');
   else if (activeTopic === 'unrated') document.getElementById('filter-unrated').classList.add('active');
   else {
@@ -756,6 +791,16 @@ function renderCard() {
   } else {
     document.querySelector('.card-front').style.borderColor = '#475569';
   }
+
+  // Update star button
+  const starEl = document.getElementById('star-btn');
+  if (stars[key]) {
+    starEl.textContent = '\u2605';
+    starEl.classList.add('starred');
+  } else {
+    starEl.textContent = '\u2606';
+    starEl.classList.remove('starred');
+  }
 }
 
 function flipCard() {
@@ -815,10 +860,12 @@ function updateStats() {
     else if (r === 'medium') medium++;
     else if (r === 'hard') hard++;
   });
+  const starred = ALL_CARDS.filter(c => stars[getCardKey(c)]).length;
   document.getElementById('total-count').textContent = `${total} cards`;
   document.getElementById('easy-count').textContent = `Easy: ${easy}`;
   document.getElementById('medium-count').textContent = `Medium: ${medium}`;
   document.getElementById('hard-count').textContent = `Hard: ${hard}`;
+  document.getElementById('star-count').innerHTML = `&#9733; ${starred}`;
 }
 
 function saveRatings() {
@@ -828,6 +875,22 @@ function saveRatings() {
 function loadRatings() {
   const saved = localStorage.getItem('dsb2-flashcard-ratings');
   if (saved) ratings = JSON.parse(saved);
+  const savedStars = localStorage.getItem('dsb2-flashcard-stars');
+  if (savedStars) stars = JSON.parse(savedStars);
+}
+
+function toggleStar() {
+  if (cards.length === 0) return;
+  const card = cards[currentIndex];
+  const key = getCardKey(card);
+  if (stars[key]) {
+    delete stars[key];
+  } else {
+    stars[key] = true;
+  }
+  localStorage.setItem('dsb2-flashcard-stars', JSON.stringify(stars));
+  renderCard();
+  updateStats();
 }
 
 function toggleMode() {
@@ -1188,6 +1251,10 @@ document.addEventListener('keydown', (e) => {
       break;
     case '3':
       if (isFlipped || mode === 'quiz') rateCard('easy');
+      break;
+    case 'f':
+    case 'F':
+      toggleStar();
       break;
     case 's':
     case 'S':
