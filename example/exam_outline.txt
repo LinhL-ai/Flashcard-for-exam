@@ -1,0 +1,12 @@
+Slide 32: Interpret linear regression, potentially moderation
+Slide 51: Interpret coefficient plot
+Slide 56: Write down a regression equation
+Slide 61: Why do we use logistic regression -> dependent variable is 0 or 1
+Slide 72: Difference between clustering & classification
+Slide 85: Prediction with K-nearest neighbour
+Slide 90: What is a decision tree? How to navigate a tree (unseen record)
+Slide 98: Interpreting R output of a decision tree node
+Slide 105: Explain three conditions for causality, example of a rival explanation
+Slide 122: Key assumptions of DiD: Parallel trends assumption connected to DiD requirements
+Slide 154: Reinforcement learning: Interpret next step based on Thompson Sampling using Beta charts
+Question for A/B Test (high level, not in detail)

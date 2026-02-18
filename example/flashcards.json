@@ -1,0 +1,472 @@
+[
+  {
+    "question": "What is the equation for a linear regression model with Days_Before_Game as the dependent variable?",
+    "answer": "The equation is: Days_Before_Game = b0 + b1*Ticket_Price + b2*Num_Tickets_Purchased + b3*Seat_Location + b4*Age + b5*Fan_Mailing_List + e, where b0 is the intercept, b1 to b5 are coefficients for the independent variables, and e is the error term.",
+    "topic": "Linear Regression & Interpretation"
+  },
+  {
+    "question": "How do you interpret the output of a linear regression model in R?",
+    "answer": "Interpret the coefficients to understand the relationship between each independent variable and the dependent variable. Check the p-values to assess statistical significance, and use R-squared to evaluate model fit. For example, in the model summary, a significant p-value for Ticket_Price suggests it has a meaningful impact on Days_Before_Game.",
+    "topic": "Linear Regression & Interpretation"
+  },
+  {
+    "question": "What does statistical significance mean in the context of regression analysis?",
+    "answer": "Statistical significance indicates whether the relationship observed in the sample data is likely to exist in the population. A p-value less than a chosen significance level (e.g., 0.05) suggests that the null hypothesis (no effect) can be rejected, implying a significant relationship between the independent and dependent variables.",
+    "topic": "Linear Regression & Interpretation"
+  },
+  {
+    "question": "How is the t-test statistic calculated in regression analysis?",
+    "answer": "The t-test statistic is calculated as t = b / SE(b), where b is the regression coefficient and SE(b) is the standard error of the coefficient. This statistic helps determine if the coefficient is significantly different from zero.",
+    "topic": "Linear Regression & Interpretation"
+  },
+  {
+    "question": "What is the role of exploratory data analysis (EDA) in regression modeling?",
+    "answer": "EDA helps examine the structure, distribution, and relationships in the data to detect patterns and inform subsequent modeling choices. It involves visualizing data, checking for outliers, and understanding variable distributions to ensure appropriate model specification.",
+    "topic": "Linear Regression & Interpretation"
+  },
+  {
+    "question": "Why is model specification important in linear regression?",
+    "answer": "Model specification involves selecting the correct functional form and variables for the regression equation. Proper specification ensures that the model accurately represents the underlying data-generating process, leading to valid and reliable predictions.",
+    "topic": "Linear Regression & Interpretation"
+  },
+  {
+    "question": "How can linear regression be used to make predictions?",
+    "answer": "Linear regression can predict outcomes for new data by applying the estimated regression equation. For example, using the model Days_Before_Game = b0 + b1*Ticket_Price + ..., you can input values for the independent variables to predict Days_Before_Game for a new observation.",
+    "topic": "Linear Regression & Interpretation"
+  },
+  {
+    "question": "What is the difference between Type I and Type II errors in hypothesis testing?",
+    "answer": "A Type I error occurs when the null hypothesis is incorrectly rejected (false positive), while a Type II error occurs when the null hypothesis is not rejected when it is false (false negative). In regression, Type I errors imply finding a significant effect when there isn't one, and Type II errors imply missing a significant effect.",
+    "topic": "Linear Regression & Interpretation"
+  },
+  {
+    "question": "What does a point on a coefficient plot represent?",
+    "answer": "A point on a coefficient plot represents the regression coefficient (b) for a variable, placing it on a common scale to show its effect size.",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "How do you interpret the distance of a point from the zero line in a coefficient plot?",
+    "answer": "The greater the distance of a point from the zero line, the larger the effect size of the variable it represents.",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "What do the whiskers in a coefficient plot indicate?",
+    "answer": "The whiskers in a coefficient plot indicate the confidence interval (CI), typically the 95% CI, which is derived from the estimate of the regression coefficient (b) and its standard error (SE).",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "How can you assess the precision of an effect using a coefficient plot?",
+    "answer": "The precision of an effect is assessed by the width of the confidence interval: a narrower CI indicates higher confidence and precision, while a wider CI suggests lower confidence and a noisier effect.",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "What does it mean if a confidence interval crosses zero in a coefficient plot?",
+    "answer": "If a confidence interval crosses zero, it means the effect is statistically insignificant, as the true effect could be zero.",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "Provide an example of interpreting a coefficient plot in a practical scenario.",
+    "answer": "In a study of game ticket revenue, a coefficient plot might show that 'Average ticket price' has a positive coefficient far from zero, suggesting a strong positive effect on revenue, while 'Opponent league rank' might have a coefficient close to zero, indicating little to no effect.",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "How is the confidence interval (CI) calculated in a coefficient plot?",
+    "answer": "The confidence interval is calculated using the formula: CI = b ± 1.96 * SE(b), where b is the regression coefficient and SE(b) is its standard error.",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "Why are coefficient plots useful in regression analysis?",
+    "answer": "Coefficient plots are useful because they ease interpretation, allow for quick assessment of confidence in estimates, and enable comparison of effects across different variables.",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "What role does standard error play in determining the confidence interval in a coefficient plot?",
+    "answer": "Standard error is used to calculate the confidence interval; a larger standard error results in a wider confidence interval, indicating less precision in the estimate.",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "How can you use R to create a coefficient plot?",
+    "answer": "In R, you can use the 'coefplot' package to create a coefficient plot by fitting a regression model and then using the 'coefplot()' function to visualize the coefficients and their confidence intervals.",
+    "topic": "Coefficient Plots"
+  },
+  {
+    "question": "What is moderation in the context of linear regression?",
+    "answer": "Moderation refers to the situation where the relationship between an independent variable X1 and a dependent variable Y depends on the level of another variable X2, called the moderator. It is modeled by including an interaction term X1*X2 in the regression equation.",
+    "topic": "Moderation (Interaction Effects)"
+  },
+  {
+    "question": "How do you write a regression equation with a moderation term?",
+    "answer": "The regression equation with a moderation term is written as: Y_i = b0 + b1*X1 + b2*X2 + b3*X1*X2 + e_i, where b3 represents the moderating effect.",
+    "topic": "Moderation (Interaction Effects)"
+  },
+  {
+    "question": "In the Adler Mannheim case, what is the role of 'Repeat Visitor' in the regression model?",
+    "answer": "'Repeat Visitor' acts as the moderator variable (X2) in the regression model, affecting how the relationship between 'Age' (X1) and 'Ticket Revenue' (Y) varies.",
+    "topic": "Moderation (Interaction Effects)"
+  },
+  {
+    "question": "What is the R code to model moderation using linear regression?",
+    "answer": "The R code to model moderation is: interaction_model <- lm(Y ~ X1 * X2, data = df). This includes the interaction term X1*X2 in the model.",
+    "topic": "Moderation (Interaction Effects)"
+  },
+  {
+    "question": "How do you interpret the interaction term in a regression model?",
+    "answer": "The interaction term (b3*X1*X2) indicates how the effect of X1 on Y changes with different levels of X2. A significant interaction term suggests that the relationship between X1 and Y is different at different levels of X2.",
+    "topic": "Moderation (Interaction Effects)"
+  },
+  {
+    "question": "What are the main effects in a moderated regression model?",
+    "answer": "In a moderated regression model, the main effects are the coefficients b1 and b2, which represent the individual effects of X1 and X2 on Y, respectively, without considering the interaction.",
+    "topic": "Moderation (Interaction Effects)"
+  },
+  {
+    "question": "Provide an example of a continuous-by-categorical interaction in regression.",
+    "answer": "In the Adler Mannheim case, 'Age' (continuous) interacts with 'Repeat Visitor' (categorical) to affect 'Ticket Revenue'. The slope of the relationship between 'Age' and 'Ticket Revenue' differs between repeat visitors and first-time visitors.",
+    "topic": "Moderation (Interaction Effects)"
+  },
+  {
+    "question": "What is the difference between a continuous-by-continuous and a categorical-by-categorical interaction?",
+    "answer": "A continuous-by-continuous interaction involves two continuous variables and examines how the slope of one variable changes with the level of another. A categorical-by-categorical interaction compares differences in means between groups represented by two categorical variables.",
+    "topic": "Moderation (Interaction Effects)"
+  },
+  {
+    "question": "Why is it important to include interaction terms in regression models?",
+    "answer": "Including interaction terms in regression models allows for the examination of conditional relationships, providing insights into how the effect of one variable on the outcome changes depending on the level of another variable. This is crucial for understanding complex relationships in data.",
+    "topic": "Moderation (Interaction Effects)"
+  },
+  {
+    "question": "Why do we use logistic regression instead of linear regression for binary dependent variables?",
+    "answer": "Logistic regression is used for binary dependent variables because it transforms the linear regression function into values within the range of 0 to 1 using a sigmoid function, forming an S-shaped curve. This ensures that predicted probabilities are valid (i.e., between 0 and 1), unlike linear regression which can predict values outside this range.",
+    "topic": "Logistic Regression"
+  },
+  {
+    "question": "What is the formula for the logistic regression model?",
+    "answer": "The logistic regression model is expressed as Pr(Y=1|X=x) = e^(b0 + b1*X) / (1 + e^(b0 + b1*X)), where Pr(Y=1|X=x) is the probability of the dependent variable Y being 1 given the independent variable X.",
+    "topic": "Logistic Regression"
+  },
+  {
+    "question": "How do you interpret the coefficients in a logistic regression model?",
+    "answer": "Coefficients in a logistic regression model are in log-odds. To interpret them, we use the exponential function Exp(β), which gives us the odds ratio. A coefficient greater than 1 increases the odds of the outcome, while a coefficient less than 1 decreases the odds.",
+    "topic": "Logistic Regression"
+  },
+  {
+    "question": "Provide an example of interpreting an odds ratio from a logistic regression model.",
+    "answer": "If the coefficient for 'Income' is 0.30, the odds ratio is Exp(0.30) = 1.35. This means that an increase of €10,000 in income increases the odds of the outcome by 35%.",
+    "topic": "Logistic Regression"
+  },
+  {
+    "question": "What is the significance of the S-curve in logistic regression?",
+    "answer": "The S-curve in logistic regression represents the sigmoid function that maps predicted values to probabilities between 0 and 1. This curve ensures that the model's predictions are valid probabilities, which is crucial for binary outcomes.",
+    "topic": "Logistic Regression"
+  },
+  {
+    "question": "Explain the practical application of logistic regression in a business context.",
+    "answer": "In a business context, logistic regression can be used to predict whether a customer will buy a product (binary outcome: yes or no) based on factors like age, income, and previous purchase history. The model helps in targeting marketing efforts more effectively.",
+    "topic": "Logistic Regression"
+  },
+  {
+    "question": "How does logistic regression handle different types of independent variables?",
+    "answer": "Logistic regression can handle any kind of independent variable, whether continuous or categorical. It models the probability of the binary outcome by transforming the linear combination of these variables using the logistic function.",
+    "topic": "Logistic Regression"
+  },
+  {
+    "question": "What estimation method does logistic regression use, and why?",
+    "answer": "Logistic regression uses maximum likelihood estimation (MLE) because the errors are not constant, unlike in linear regression. MLE finds the parameter values that maximize the likelihood of observing the given set of data.",
+    "topic": "Logistic Regression"
+  },
+  {
+    "question": "Write down the logistic regression equation and explain each component.",
+    "answer": "The logistic regression equation is Pr(Y=1|X=x) = e^(b0 + b1*X) / (1 + e^(b0 + b1*X)). Pr(Y=1|X=x) is the probability of Y being 1 given X, b0 is the intercept, b1 is the coefficient for the independent variable X, and e is the base of the natural logarithm.",
+    "topic": "Logistic Regression"
+  },
+  {
+    "question": "What is the primary difference between classification and clustering?",
+    "answer": "Classification involves predicting the category of a given data point based on known labels, while clustering involves grouping data points into clusters based on data structure without prior labels.",
+    "topic": "Classification vs Clustering"
+  },
+  {
+    "question": "How does Adler Mannheim use classification in their business problem?",
+    "answer": "Adler Mannheim uses classification to decide whether specific merchandise items should be recommended to fans by measuring similarities between fans and classifying items accordingly.",
+    "topic": "Classification vs Clustering"
+  },
+  {
+    "question": "Can you provide an example of a classification problem?",
+    "answer": "An example of a classification problem is determining whether a customer's order should be flagged for manual review, using a yes/no label.",
+    "topic": "Classification vs Clustering"
+  },
+  {
+    "question": "What is an example of a clustering problem?",
+    "answer": "An example of a clustering problem is discovering different types of customer segments within a dataset without predefined labels.",
+    "topic": "Classification vs Clustering"
+  },
+  {
+    "question": "What is the role of labels in classification versus clustering?",
+    "answer": "In classification, labels are known and used to train the model to predict outcomes. In clustering, labels are unknown, and the goal is to discover natural groupings within the data.",
+    "topic": "Classification vs Clustering"
+  },
+  {
+    "question": "What is the general process of creating classifiers?",
+    "answer": "The process involves collecting a dataset with known group memberships, splitting it into training and test sets, building a prediction model to accurately predict membership, and assessing the model's performance against chance or alternative models.",
+    "topic": "Classification vs Clustering"
+  },
+  {
+    "question": "What are some common methods used in classification?",
+    "answer": "Common classification methods include K-Nearest Neighbors, Decision Trees/Random Forests, Rule Learning, Naïve Bayes, Support Vector Machines, and Artificial Neural Networks.",
+    "topic": "Classification vs Clustering"
+  },
+  {
+    "question": "Why is logistic regression used in classification problems?",
+    "answer": "Logistic regression is used when the dependent variable is binary (0 or 1), allowing for the prediction of probabilities of class membership.",
+    "topic": "Classification vs Clustering"
+  },
+  {
+    "question": "What is the k-nearest neighbors (KNN) algorithm used for?",
+    "answer": "K-nearest neighbors (KNN) is a non-parametric algorithm used for classification and regression tasks. It predicts the class or value of a target data point based on the majority class or average value of its k-nearest neighbors in the feature space.",
+    "topic": "K-Nearest Neighbors & Collaborative Filtering"
+  },
+  {
+    "question": "How is Euclidean distance used in KNN?",
+    "answer": "Euclidean distance is used as a similarity metric in KNN to measure the distance between data points. It helps identify the k-nearest neighbors by calculating the straight-line distance between the target point and each point in the dataset.",
+    "topic": "K-Nearest Neighbors & Collaborative Filtering"
+  },
+  {
+    "question": "Explain majority voting in the context of KNN.",
+    "answer": "Majority voting in KNN is a method used to determine the class of a target point by selecting the most common class among its k-nearest neighbors. The class with the highest number of votes is assigned to the target point.",
+    "topic": "K-Nearest Neighbors & Collaborative Filtering"
+  },
+  {
+    "question": "How does collaborative filtering relate to KNN?",
+    "answer": "Collaborative filtering uses KNN to recommend products by analyzing user-item interactions. It identifies users with similar preferences (neighbors) and predicts whether a target user would like an item based on the preferences of these similar users.",
+    "topic": "K-Nearest Neighbors & Collaborative Filtering"
+  },
+  {
+    "question": "How would you decide whether to recommend the 'Wallet' to Erik using KNN?",
+    "answer": "To recommend the 'Wallet' to Erik, calculate the Euclidean distance between Erik's purchase vector [1,0,1,?] and other users' vectors. Identify the k-nearest neighbors and use majority voting to decide if the 'Wallet' should be recommended.",
+    "topic": "K-Nearest Neighbors & Collaborative Filtering"
+  },
+  {
+    "question": "What are some limitations of the KNN algorithm?",
+    "answer": "KNN can be computationally slow as it requires comparing the target point to all training examples. It also suffers from the cold start problem, needing data on new users to make accurate predictions. Additionally, results depend on the choice of proximity measure.",
+    "topic": "K-Nearest Neighbors & Collaborative Filtering"
+  },
+  {
+    "question": "What practical business applications can KNN be used for?",
+    "answer": "KNN is used in various business applications such as product recommendations (e.g., Netflix, Amazon), customer segmentation, and fraud detection. It leverages user similarity to predict preferences and behaviors.",
+    "topic": "K-Nearest Neighbors & Collaborative Filtering"
+  },
+  {
+    "question": "Describe the process of implementing KNN for product recommendations.",
+    "answer": "To implement KNN for product recommendations: 1) Define a similarity metric (e.g., Euclidean distance). 2) Identify the k most similar users to the target user. 3) Aggregate the outcomes of these neighbors using majority voting or averaging to make a recommendation.",
+    "topic": "K-Nearest Neighbors & Collaborative Filtering"
+  },
+  {
+    "question": "What is a decision tree and how is it used in classification?",
+    "answer": "A decision tree is a model that predicts a categorical label by encoding decisions into a sequence of single-attribute splits. It is used to classify data by branching through these splits from the root to a leaf node, which provides the classification decision.",
+    "topic": "Decision Trees"
+  },
+  {
+    "question": "How do you navigate a decision tree for an unseen record?",
+    "answer": "To classify an unseen record using a decision tree, start at the root node and follow the branches according to the attribute tests until you reach a leaf node. The leaf node will provide the classification decision.",
+    "topic": "Decision Trees"
+  },
+  {
+    "question": "How can decision trees be applied to detect ticket fraud at Adler Mannheim?",
+    "answer": "Decision trees can classify transactions as potentially fraudulent based on attributes like bulk purchase and new account status. By learning from past labeled data, the tree can flag suspicious transactions for manual review.",
+    "topic": "Decision Trees"
+  },
+  {
+    "question": "What is the CART algorithm and how does it construct a decision tree?",
+    "answer": "The CART algorithm constructs a decision tree by making binary splits that maximize the purity of resulting groups. It starts with all observations in one node, evaluates potential splits for purity, chooses the best split, and applies this recursively until nodes are pure or a stopping rule is reached.",
+    "topic": "Decision Trees"
+  },
+  {
+    "question": "How is Gini impurity calculated and used in decision trees?",
+    "answer": "Gini impurity is calculated as 1 - sum(p_k^2) for each class k in a node, where p_k is the proportion of class k. It measures how mixed the classes are, with 0 being pure. In decision trees, splits are chosen to minimize the weighted average Gini impurity of child nodes.",
+    "topic": "Decision Trees"
+  },
+  {
+    "question": "How do you interpret the output of a decision tree node in R?",
+    "answer": "In R, a decision tree node's output includes the predicted class, estimated probabilities for each class, and the share of observations in that node. Nodes are colored by predicted class, with darker colors indicating higher purity.",
+    "topic": "Decision Trees"
+  },
+  {
+    "question": "What is the role of the 'control' parameter in the R 'rpart' function?",
+    "answer": "The 'control' parameter in the 'rpart' function specifies settings for tree growth, such as 'cp' (complexity parameter), which determines the minimum improvement needed at each node to continue splitting. A lower 'cp' allows for more splits, potentially leading to a more complex tree.",
+    "topic": "Decision Trees"
+  },
+  {
+    "question": "What are the advantages and limitations of decision trees?",
+    "answer": "Decision trees are fast and interpretable for small datasets, providing accuracy comparable to other methods for low-dimensional data. However, they struggle with high-dimensional data and do not account for interactions between attributes.",
+    "topic": "Decision Trees"
+  },
+  {
+    "question": "What are the three conditions for establishing causality?",
+    "answer": "The three conditions for establishing causality are: 1) Covariation of cause (X) and effect (Y), meaning changes in X are systematically associated with changes in Y; 2) Temporal precedence, where changes in X occur before changes in Y; 3) No rival explanation, ensuring no other factors account for the observed relationship.",
+    "topic": "Causality & A/B Testing"
+  },
+  {
+    "question": "Provide an example of a rival explanation in causal inference.",
+    "answer": "A rival explanation could be a weather change that affects both ad impressions and purchases. For instance, fewer people outdoors due to bad weather might lead to more browsing and purchases, making it appear as if an ad campaign caused the increase in sales.",
+    "topic": "Causality & A/B Testing"
+  },
+  {
+    "question": "What is the primary purpose of an A/B test in causal analytics?",
+    "answer": "The primary purpose of an A/B test is to determine the causal impact of a treatment by randomly assigning subjects to either a control group or a treatment group, then comparing the outcomes to assess the effect of the treatment.",
+    "topic": "Causality & A/B Testing"
+  },
+  {
+    "question": "Why is randomization important in A/B testing?",
+    "answer": "Randomization is crucial in A/B testing because it ensures that any differences in outcomes between the control and treatment groups can be attributed to the treatment itself, rather than pre-existing differences between the groups.",
+    "topic": "Causality & A/B Testing"
+  },
+  {
+    "question": "What are some common challenges that make A/B testing infeasible?",
+    "answer": "Common challenges include: 1) Inability to randomize due to policies or technical constraints; 2) Lack of time or budget for experimentation; 3) Ethical, legal, or reputational constraints; 4) Long-run effects that cannot be captured in short-term experiments; 5) External factors like competitor actions or regulatory changes.",
+    "topic": "Causality & A/B Testing"
+  },
+  {
+    "question": "Explain the concept of temporal precedence with an example.",
+    "answer": "Temporal precedence means establishing that changes in the cause (X) occur before changes in the effect (Y). For example, if a company increases its marketing budget (X) and subsequently sees an increase in sales (Y), temporal precedence is established if the budget increase clearly happened before the sales increase.",
+    "topic": "Causality & A/B Testing"
+  },
+  {
+    "question": "How can covariation between cause and effect be confirmed?",
+    "answer": "Covariation can be confirmed through statistical analysis that shows a systematic association between changes in the independent variable (X) and changes in the dependent variable (Y). For example, using regression analysis to demonstrate that increased advertising spend (X) is associated with increased sales (Y).",
+    "topic": "Causality & A/B Testing"
+  },
+  {
+    "question": "What is a confounder, and how does it affect causal inference?",
+    "answer": "A confounder is a variable that influences both the independent variable and the outcome, potentially creating a spurious association. For instance, if both ice cream sales and drowning incidents increase in summer, temperature is a confounder affecting both, not ice cream sales causing drownings.",
+    "topic": "Causality & A/B Testing"
+  },
+  {
+    "question": "What is the Difference-in-Differences (DiD) method?",
+    "answer": "Difference-in-Differences (DiD) is a quasi-experimental design used to estimate causal relationships. It compares the changes in outcomes over time between a treatment group, which receives an intervention, and a control group, which does not.",
+    "topic": "Difference-in-Differences"
+  },
+  {
+    "question": "What is the parallel trends assumption in DiD?",
+    "answer": "The parallel trends assumption posits that, in the absence of treatment, the average outcomes for the treatment and control groups would have evolved similarly over time. This assumption is crucial for the validity of DiD estimates.",
+    "topic": "Difference-in-Differences"
+  },
+  {
+    "question": "What are the five requirements for a valid DiD intervention?",
+    "answer": "The five requirements are: Exogeneity (intervention is driven by external forces), Compliance (affected units actually receive the intervention), Partial Exposure (some units are affected while others are not), Unanticipated (units do not expect the intervention), and No Spillover (intervention does not affect the control group).",
+    "topic": "Difference-in-Differences"
+  },
+  {
+    "question": "How is the DiD regression model structured?",
+    "answer": "The DiD regression model is structured as: Y_i = β0 + β1*Treat_i + β2*After + β3*(Treat_i × After) + ε_i, where Treat is a binary variable indicating treatment group membership, and After is a binary variable indicating the post-treatment period.",
+    "topic": "Difference-in-Differences"
+  },
+  {
+    "question": "What was the key finding of Card and Krueger's (1994) DiD study?",
+    "answer": "Card and Krueger (1994) found that the increase in New Jersey's minimum wage led to an increase of +2.76 in mean full-time-equivalent employment compared to Pennsylvania, which did not change its minimum wage.",
+    "topic": "Difference-in-Differences"
+  },
+  {
+    "question": "How can you check for parallel trends in a DiD study?",
+    "answer": "To check for parallel trends, compare the pre-treatment trends of the treatment and control groups. If they are similar, the parallel trends assumption is likely satisfied. This can be done graphically or statistically by testing for differences in pre-treatment trends.",
+    "topic": "Difference-in-Differences"
+  },
+  {
+    "question": "What is a potential violation of the parallel trends assumption in the Card and Krueger study?",
+    "answer": "A potential violation could occur if there were other economic changes or policies in New Jersey or Pennsylvania around the same time that differentially affected employment trends, independent of the minimum wage change.",
+    "topic": "Difference-in-Differences"
+  },
+  {
+    "question": "How would you write a DiD regression equation for the Adler Mannheim case?",
+    "answer": "The regression equation for the Adler Mannheim case is: Ticket_Revenue_i = β0 + β1*Adler_i + β2*After + β3*(Adler_i × After) + ε_i, where Adler is a binary variable for Adler Mannheim games, and After indicates the period after the pricing change.",
+    "topic": "Difference-in-Differences"
+  },
+  {
+    "question": "What is the difference between lift and acceleration in the context of DiD?",
+    "answer": "Lift refers to a permanent increase in the level of an outcome due to treatment, while acceleration means the outcome occurs earlier than it would have without treatment. Both have different implications for interpreting DiD results.",
+    "topic": "Difference-in-Differences"
+  },
+  {
+    "question": "What is the multi-armed bandit problem?",
+    "answer": "The multi-armed bandit problem is a sequential decision-making problem where the goal is to maximize cumulative reward by choosing from a set of options (arms), each with an unknown reward distribution. It involves balancing exploration (trying new options) and exploitation (choosing the best-known option).",
+    "topic": "Reinforcement Learning & Thompson Sampling"
+  },
+  {
+    "question": "How does Thompson Sampling work in the context of multi-armed bandits?",
+    "answer": "Thompson Sampling involves assuming a prior distribution for each arm, typically a Beta distribution. In each round, a sample is drawn from each arm's distribution, and the arm with the highest sample value is selected. After observing the reward, the distribution is updated by adjusting the parameters alpha and beta based on the reward received.",
+    "topic": "Reinforcement Learning & Thompson Sampling"
+  },
+  {
+    "question": "What are the key differences between exploration and exploitation in multi-armed bandit strategies?",
+    "answer": "Exploration involves trying different arms to gather information about their reward distributions, while exploitation involves selecting the arm with the highest estimated reward to maximize immediate gain. Pure exploitation can lead to linear cumulative regret, as it may miss better options, while pure exploration also results in linear regret due to random selection.",
+    "topic": "Reinforcement Learning & Thompson Sampling"
+  },
+  {
+    "question": "What is the role of the Beta distribution in Thompson Sampling?",
+    "answer": "In Thompson Sampling, the Beta distribution is used as a prior for modeling the probability of success for each arm. The parameters alpha and beta are updated based on observed rewards, allowing the algorithm to maintain a probabilistic estimate of each arm's effectiveness.",
+    "topic": "Reinforcement Learning & Thompson Sampling"
+  },
+  {
+    "question": "How would you interpret the next step in a Thompson Sampling example using Beta charts?",
+    "answer": "In a Thompson Sampling example, the next step involves sampling from the Beta distribution of each arm to determine which arm to pull next. The arm with the highest sampled value is chosen, and its distribution is updated based on the observed reward. This process iteratively refines the estimates of each arm's reward potential.",
+    "topic": "Reinforcement Learning & Thompson Sampling"
+  },
+  {
+    "question": "What are the practical applications of multi-armed bandits in business?",
+    "answer": "Multi-armed bandits are used in digital environments like e-commerce and online advertising to optimize decisions in real-time. They are effective in settings where conditions change frequently, allowing businesses to allocate resources to the best-performing options, such as ad creatives or pricing strategies, based on user behavior and performance metrics.",
+    "topic": "Reinforcement Learning & Thompson Sampling"
+  },
+  {
+    "question": "What is a potential drawback of the Epsilon-Greedy strategy?",
+    "answer": "A drawback of the Epsilon-Greedy strategy is that it requires a fixed exploration probability (epsilon), which may not adapt well to changing environments. This can lead to suboptimal performance if the chosen epsilon is not suitable for the problem's dynamics, potentially resulting in either too much exploration or insufficient exploration.",
+    "topic": "Reinforcement Learning & Thompson Sampling"
+  },
+  {
+    "question": "In the Adler Mannheim case, how is Thompson Sampling used to optimize ad performance?",
+    "answer": "In the Adler Mannheim case, Thompson Sampling is used to optimize ad performance by treating each ad type (action-focused, star close-up, family experience) as an arm. The algorithm samples from each ad's Beta distribution to decide which ad to show, updating the distribution based on whether the ad was clicked (reward = 1) or not (reward = 0).",
+    "topic": "Reinforcement Learning & Thompson Sampling"
+  },
+  {
+    "question": "What is an artificial neural network (ANN)?",
+    "answer": "An artificial neural network (ANN) is a computational model inspired by the way biological neural networks in the brain process information. It consists of interconnected nodes (neurons) organized in layers: input, hidden, and output layers. Each connection (edge) represents the flow of data, with the hidden layers performing transformations on the input data to produce an output.",
+    "topic": "Artificial Neural Networks"
+  },
+  {
+    "question": "How do biological neurons compare to artificial neurons?",
+    "answer": "Biological neurons are the fundamental units of the brain that receive sensory input, transform signals, and send them to other neurons or muscles. Similarly, artificial neurons receive input, transform it using a mathematical function, and produce an output. Both types of neurons are designed to process and transmit information, but artificial neurons do so using mathematical functions.",
+    "topic": "Artificial Neural Networks"
+  },
+  {
+    "question": "What is deep learning and how does it relate to artificial neural networks?",
+    "answer": "Deep learning is a subset of machine learning that uses artificial neural networks with many layers (deep networks) to model complex patterns in data. It leverages the architecture of ANNs to perform tasks such as image and speech recognition, where traditional algorithms may struggle.",
+    "topic": "Artificial Neural Networks"
+  },
+  {
+    "question": "What are the key components of an artificial neural network?",
+    "answer": "The key components of an artificial neural network include: 1) Input layer, which receives the data; 2) Hidden layers, which perform transformations and computations on the data; 3) Output layer, which produces the final result. Each layer consists of nodes (neurons) that are interconnected, allowing data to flow through the network.",
+    "topic": "Artificial Neural Networks"
+  },
+  {
+    "question": "How does an artificial neuron process information?",
+    "answer": "An artificial neuron processes information by receiving input values, applying a mathematical function (activation function) to these inputs, and producing an output. The function often includes weights and biases that are adjusted during training to improve the model's accuracy.",
+    "topic": "Artificial Neural Networks"
+  },
+  {
+    "question": "What is the role of hidden layers in an artificial neural network?",
+    "answer": "Hidden layers in an artificial neural network perform intermediate computations and transformations on the input data. They enable the network to learn complex patterns and representations by adjusting the weights and biases during the training process.",
+    "topic": "Artificial Neural Networks"
+  },
+  {
+    "question": "Can you provide an example of a practical application of artificial neural networks?",
+    "answer": "A practical application of artificial neural networks is in image recognition, such as identifying objects in photographs. Companies like Adler Mannheim use ANNs to automate the analysis of large datasets, improving efficiency and accuracy in tasks like customer segmentation and predictive analytics.",
+    "topic": "Artificial Neural Networks"
+  },
+  {
+    "question": "What is the significance of the activation function in an artificial neuron?",
+    "answer": "The activation function in an artificial neuron determines the output of the neuron given an input or set of inputs. It introduces non-linearity into the model, allowing the network to learn complex patterns. Common activation functions include ReLU, sigmoid, and tanh.",
+    "topic": "Artificial Neural Networks"
+  },
+  {
+    "question": "How is training performed in an artificial neural network?",
+    "answer": "Training in an artificial neural network involves adjusting the weights and biases of the network to minimize the difference between the predicted output and the actual output. This is typically done using a process called backpropagation, combined with an optimization algorithm like gradient descent.",
+    "topic": "Artificial Neural Networks"
+  }
+]

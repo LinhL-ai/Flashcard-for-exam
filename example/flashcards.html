@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Business II - Exam Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: #1e293b;
+    padding: 16px 24px;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  header h1 { font-size: 1.25rem; color: #60a5fa; }
+  .header-stats {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #94a3b8;
+  }
+  .stat-badge {
+    background: #334155;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .stat-badge.green { background: #166534; color: #4ade80; }
+  .stat-badge.amber { background: #713f12; color: #fbbf24; }
+  .stat-badge.red { background: #7f1d1d; color: #f87171; }
+
+  .controls {
+    background: #1e293b;
+    padding: 12px 24px;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .topic-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid #475569;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+  .topic-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+  .topic-btn.active { background: #1d4ed8; border-color: #1d4ed8; color: white; }
+  .mode-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: auto;
+    transition: all 0.2s;
+  }
+  .mode-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+  .mode-btn.active { background: #7c3aed; border-color: #7c3aed; color: white; }
+
+  .main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    gap: 20px;
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    max-width: 700px;
+    height: 6px;
+    background: #334155;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    transition: width 0.3s;
+    border-radius: 3px;
+  }
+
+  .card-counter {
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+
+  .flashcard-container {
+    perspective: 1200px;
+    width: 100%;
+    max-width: 700px;
+    min-height: 340px;
+    cursor: pointer;
+  }
+
+  .flashcard {
+    width: 100%;
+    min-height: 340px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .card-front {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    border: 1px solid #475569;
+  }
+  .card-back {
+    background: linear-gradient(135deg, #1a2744, #1e3a5f);
+    border: 1px solid #2563eb;
+    transform: rotateY(180deg);
+  }
+
+  .card-label {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+  }
+  .card-topic {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 0.7rem;
+    color: #60a5fa;
+    max-width: 200px;
+    text-align: right;
+  }
+
+  .card-front .card-text {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    color: #f1f5f9;
+  }
+  .card-back .card-text {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #cbd5e1;
+  }
+
+  .flip-hint {
+    position: absolute;
+    bottom: 16px;
+    font-size: 0.75rem;
+    color: #475569;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .nav-btn {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: 1px solid #475569;
+    background: #1e293b;
+    color: #e2e8f0;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover:not(:disabled) { background: #334155; border-color: #60a5fa; }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .confidence-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .conf-btn {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .conf-btn.hard { background: #dc2626; color: white; }
+  .conf-btn.medium { background: #d97706; color: white; }
+  .conf-btn.easy { background: #16a34a; color: white; }
+  .conf-btn:hover { transform: scale(1.05); filter: brightness(1.15); }
+
+  .keyboard-hints {
+    font-size: 0.75rem;
+    color: #475569;
+    text-align: center;
+  }
+  .keyboard-hints kbd {
+    background: #334155;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: inherit;
+    margin: 0 2px;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: #64748b;
+    font-size: 1.1rem;
+    padding: 60px 20px;
+  }
+  .empty-state h2 { color: #4ade80; margin-bottom: 12px; }
+
+  /* Quiz mode */
+  .quiz-input {
+    width: 100%;
+    max-width: 700px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #475569;
+    background: #1e293b;
+    color: #e2e8f0;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+  }
+  .quiz-input:focus { outline: none; border-color: #60a5fa; }
+  .quiz-submit {
+    padding: 10px 28px;
+    border-radius: 10px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .quiz-submit:hover { background: #1d4ed8; }
+
+  .quiz-feedback {
+    width: 100%;
+    max-width: 700px;
+    padding: 20px;
+    border-radius: 12px;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: #14532d; border: 1px solid #166534; color: #86efac; }
+  .quiz-feedback.partial { background: #422006; border: 1px solid #713f12; color: #fde68a; }
+  .quiz-feedback h4 { margin-bottom: 8px; }
+
+  /* Editor modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 16px;
+    padding: 28px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal h2 { color: #60a5fa; margin-bottom: 16px; font-size: 1.15rem; }
+  .modal label {
+    display: block;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    margin-top: 14px;
+  }
+  .modal textarea, .modal input, .modal select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .modal textarea:focus, .modal input:focus, .modal select:focus {
+    outline: none;
+    border-color: #60a5fa;
+  }
+  .modal textarea { min-height: 80px; }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    justify-content: flex-end;
+  }
+  .modal-btn {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .modal-btn.primary { background: #2563eb; color: white; }
+  .modal-btn.primary:hover { background: #1d4ed8; }
+  .modal-btn.danger { background: #dc2626; color: white; }
+  .modal-btn.danger:hover { background: #b91c1c; }
+  .modal-btn.secondary { background: #334155; color: #e2e8f0; }
+  .modal-btn.secondary:hover { background: #475569; }
+
+  .edit-card-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 20px;
+    font-size: 0.75rem;
+    color: #475569;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .edit-card-btn:hover { color: #60a5fa; background: #334155; }
+
+  /* Card list in manage modal */
+  .card-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #334155;
+    gap: 8px;
+  }
+  .card-list-item:hover { background: #334155; }
+  .card-list-q { flex: 1; font-size: 0.85rem; color: #cbd5e1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card-list-topic { font-size: 0.7rem; color: #60a5fa; white-space: nowrap; }
+  .card-list-actions { display: flex; gap: 4px; }
+  .card-list-actions button {
+    padding: 3px 8px; border-radius: 4px; border: none; cursor: pointer;
+    font-size: 0.7rem; font-weight: 600;
+  }
+  .card-list-actions .edit-btn { background: #334155; color: #60a5fa; }
+  .card-list-actions .del-btn { background: #334155; color: #f87171; }
+
+  .manage-search {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+  }
+  .manage-search:focus { outline: none; border-color: #60a5fa; }
+
+  @media (max-width: 640px) {
+    .card-face { padding: 24px 20px; }
+    .card-front .card-text { font-size: 1.1rem; }
+    .card-back .card-text { font-size: 0.95rem; }
+    .controls { padding: 8px 12px; }
+    header { padding: 12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Data Business II - Exam Prep</h1>
+  <div class="header-stats">
+    <span class="stat-badge" id="total-count">94 cards</span>
+    <span class="stat-badge green" id="easy-count">Easy: 0</span>
+    <span class="stat-badge amber" id="medium-count">Medium: 0</span>
+    <span class="stat-badge red" id="hard-count">Hard: 0</span>
+  </div>
+</header>
+
+<div class="controls" id="topic-controls"></div>
+
+<div class="main-area" id="main-area">
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+  <div class="card-counter" id="card-counter">1 / 94</div>
+
+  <div class="flashcard-container" id="flashcard-container" onclick="flipCard()">
+    <div class="flashcard" id="flashcard">
+      <div class="card-face card-front">
+        <div class="card-label">Question</div>
+        <div class="card-topic" id="card-topic"></div>
+        <div class="card-text" id="card-question"></div>
+        <div class="flip-hint">Click or press Space to flip</div>
+        <button class="edit-card-btn" onclick="event.stopPropagation(); editCurrentCard()">Edit</button>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-label">Answer</div>
+        <div class="card-topic" id="card-topic-back"></div>
+        <div class="card-text" id="card-answer"></div>
+        <div class="flip-hint">Rate your confidence below</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confidence-buttons" id="confidence-buttons" style="display:none">
+    <button class="conf-btn hard" onclick="rateCard('hard')">Hard (1)</button>
+    <button class="conf-btn medium" onclick="rateCard('medium')">Medium (2)</button>
+    <button class="conf-btn easy" onclick="rateCard('easy')">Easy (3)</button>
+  </div>
+
+  <!-- Quiz mode elements (hidden by default) -->
+  <textarea class="quiz-input" id="quiz-input" placeholder="Type your answer here..." style="display:none"></textarea>
+  <button class="quiz-submit" id="quiz-submit" onclick="checkQuizAnswer()" style="display:none">Check Answer</button>
+  <div class="quiz-feedback" id="quiz-feedback"></div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" id="prev-btn" onclick="prevCard()">Previous</button>
+    <button class="nav-btn" id="shuffle-btn" onclick="shuffleCards()">Shuffle</button>
+    <button class="nav-btn" id="next-btn" onclick="nextCard()">Next</button>
+  </div>
+
+  <div class="keyboard-hints">
+    <kbd>Space</kbd> Flip &nbsp; <kbd>&larr;</kbd> Prev &nbsp; <kbd>&rarr;</kbd> Next &nbsp;
+    <kbd>1</kbd> Hard &nbsp; <kbd>2</kbd> Medium &nbsp; <kbd>3</kbd> Easy &nbsp; <kbd>S</kbd> Shuffle
+  </div>
+</div>
+
+<!-- Edit/Add Card Modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <h2 id="edit-modal-title">Edit Flashcard</h2>
+    <input type="hidden" id="edit-card-index" value="-1">
+    <label>Topic</label>
+    <select id="edit-topic"></select>
+    <input type="text" id="edit-topic-custom" placeholder="Or type a new topic..." style="margin-top:6px">
+    <label>Question</label>
+    <textarea id="edit-question" rows="3"></textarea>
+    <label>Answer</label>
+    <textarea id="edit-answer" rows="5"></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn danger" id="edit-delete-btn" onclick="deleteEditCard()">Delete</button>
+      <button class="modal-btn secondary" onclick="closeEditModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="saveEditCard()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Cards Modal -->
+<div class="modal-overlay" id="manage-modal">
+  <div class="modal" style="max-width:700px">
+    <h2>Manage Flashcards</h2>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="modal-btn primary" onclick="closeManageModal(); openEditModal(-1)">+ Add Card</button>
+      <button class="modal-btn secondary" onclick="exportCards()">Export JSON</button>
+      <button class="modal-btn secondary" onclick="document.getElementById('import-file').click()">Import JSON</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importCards(event)">
+      <button class="modal-btn danger" onclick="resetToDefault()">Reset to Default</button>
+    </div>
+    <input type="text" class="manage-search" id="manage-search" placeholder="Search cards..." oninput="renderManageList()">
+    <div id="manage-list" style="max-height:400px;overflow-y:auto"></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeManageModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Flashcard data embedded directly to avoid CORS issues with local files
+const FLASHCARD_DATA = [{"question":"What is the equation for a linear regression model with Days_Before_Game as the dependent variable?","answer":"The equation is: Days_Before_Game = b0 + b1*Ticket_Price + b2*Num_Tickets_Purchased + b3*Seat_Location + b4*Age + b5*Fan_Mailing_List + e, where b0 is the intercept, b1 to b5 are coefficients for the independent variables, and e is the error term.","topic":"Linear Regression & Interpretation"},{"question":"How do you interpret the output of a linear regression model in R?","answer":"Interpret the coefficients to understand the relationship between each independent variable and the dependent variable. Check the p-values to assess statistical significance, and use R-squared to evaluate model fit. For example, in the model summary, a significant p-value for Ticket_Price suggests it has a meaningful impact on Days_Before_Game.","topic":"Linear Regression & Interpretation"},{"question":"What does statistical significance mean in the context of regression analysis?","answer":"Statistical significance indicates whether the relationship observed in the sample data is likely to exist in the population. A p-value less than a chosen significance level (e.g., 0.05) suggests that the null hypothesis (no effect) can be rejected, implying a significant relationship between the independent and dependent variables.","topic":"Linear Regression & Interpretation"},{"question":"How is the t-test statistic calculated in regression analysis?","answer":"The t-test statistic is calculated as t = b / SE(b), where b is the regression coefficient and SE(b) is the standard error of the coefficient. This statistic helps determine if the coefficient is significantly different from zero.","topic":"Linear Regression & Interpretation"},{"question":"What is the role of exploratory data analysis (EDA) in regression modeling?","answer":"EDA helps examine the structure, distribution, and relationships in the data to detect patterns and inform subsequent modeling choices. It involves visualizing data, checking for outliers, and understanding variable distributions to ensure appropriate model specification.","topic":"Linear Regression & Interpretation"},{"question":"Why is model specification important in linear regression?","answer":"Model specification involves selecting the correct functional form and variables for the regression equation. Proper specification ensures that the model accurately represents the underlying data-generating process, leading to valid and reliable predictions.","topic":"Linear Regression & Interpretation"},{"question":"How can linear regression be used to make predictions?","answer":"Linear regression can predict outcomes for new data by applying the estimated regression equation. For example, using the model Days_Before_Game = b0 + b1*Ticket_Price + ..., you can input values for the independent variables to predict Days_Before_Game for a new observation.","topic":"Linear Regression & Interpretation"},{"question":"What is the difference between Type I and Type II errors in hypothesis testing?","answer":"A Type I error occurs when the null hypothesis is incorrectly rejected (false positive), while a Type II error occurs when the null hypothesis is not rejected when it is false (false negative). In regression, Type I errors imply finding a significant effect when there isn't one, and Type II errors imply missing a significant effect.","topic":"Linear Regression & Interpretation"},{"question":"What does a point on a coefficient plot represent?","answer":"A point on a coefficient plot represents the regression coefficient (b) for a variable, placing it on a common scale to show its effect size.","topic":"Coefficient Plots"},{"question":"How do you interpret the distance of a point from the zero line in a coefficient plot?","answer":"The greater the distance of a point from the zero line, the larger the effect size of the variable it represents.","topic":"Coefficient Plots"},{"question":"What do the whiskers in a coefficient plot indicate?","answer":"The whiskers in a coefficient plot indicate the confidence interval (CI), typically the 95% CI, which is derived from the estimate of the regression coefficient (b) and its standard error (SE).","topic":"Coefficient Plots"},{"question":"How can you assess the precision of an effect using a coefficient plot?","answer":"The precision of an effect is assessed by the width of the confidence interval: a narrower CI indicates higher confidence and precision, while a wider CI suggests lower confidence and a noisier effect.","topic":"Coefficient Plots"},{"question":"What does it mean if a confidence interval crosses zero in a coefficient plot?","answer":"If a confidence interval crosses zero, it means the effect is statistically insignificant, as the true effect could be zero.","topic":"Coefficient Plots"},{"question":"Provide an example of interpreting a coefficient plot in a practical scenario.","answer":"In a study of game ticket revenue, a coefficient plot might show that 'Average ticket price' has a positive coefficient far from zero, suggesting a strong positive effect on revenue, while 'Opponent league rank' might have a coefficient close to zero, indicating little to no effect.","topic":"Coefficient Plots"},{"question":"How is the confidence interval (CI) calculated in a coefficient plot?","answer":"The confidence interval is calculated using the formula: CI = b \\u00b1 1.96 * SE(b), where b is the regression coefficient and SE(b) is its standard error.","topic":"Coefficient Plots"},{"question":"Why are coefficient plots useful in regression analysis?","answer":"Coefficient plots are useful because they ease interpretation, allow for quick assessment of confidence in estimates, and enable comparison of effects across different variables.","topic":"Coefficient Plots"},{"question":"What role does standard error play in determining the confidence interval in a coefficient plot?","answer":"Standard error is used to calculate the confidence interval; a larger standard error results in a wider confidence interval, indicating less precision in the estimate.","topic":"Coefficient Plots"},{"question":"How can you use R to create a coefficient plot?","answer":"In R, you can use the 'coefplot' package to create a coefficient plot by fitting a regression model and then using the 'coefplot()' function to visualize the coefficients and their confidence intervals.","topic":"Coefficient Plots"},{"question":"What is moderation in the context of linear regression?","answer":"Moderation refers to the situation where the relationship between an independent variable X1 and a dependent variable Y depends on the level of another variable X2, called the moderator. It is modeled by including an interaction term X1*X2 in the regression equation.","topic":"Moderation (Interaction Effects)"},{"question":"How do you write a regression equation with a moderation term?","answer":"The regression equation with a moderation term is written as: Y_i = b0 + b1*X1 + b2*X2 + b3*X1*X2 + e_i, where b3 represents the moderating effect.","topic":"Moderation (Interaction Effects)"},{"question":"In the Adler Mannheim case, what is the role of 'Repeat Visitor' in the regression model?","answer":"'Repeat Visitor' acts as the moderator variable (X2) in the regression model, affecting how the relationship between 'Age' (X1) and 'Ticket Revenue' (Y) varies.","topic":"Moderation (Interaction Effects)"},{"question":"What is the R code to model moderation using linear regression?","answer":"The R code to model moderation is: interaction_model <- lm(Y ~ X1 * X2, data = df). This includes the interaction term X1*X2 in the model.","topic":"Moderation (Interaction Effects)"},{"question":"How do you interpret the interaction term in a regression model?","answer":"The interaction term (b3*X1*X2) indicates how the effect of X1 on Y changes with different levels of X2. A significant interaction term suggests that the relationship between X1 and Y is different at different levels of X2.","topic":"Moderation (Interaction Effects)"},{"question":"What are the main effects in a moderated regression model?","answer":"In a moderated regression model, the main effects are the coefficients b1 and b2, which represent the individual effects of X1 and X2 on Y, respectively, without considering the interaction.","topic":"Moderation (Interaction Effects)"},{"question":"Provide an example of a continuous-by-categorical interaction in regression.","answer":"In the Adler Mannheim case, 'Age' (continuous) interacts with 'Repeat Visitor' (categorical) to affect 'Ticket Revenue'. The slope of the relationship between 'Age' and 'Ticket Revenue' differs between repeat visitors and first-time visitors.","topic":"Moderation (Interaction Effects)"},{"question":"What is the difference between a continuous-by-continuous and a categorical-by-categorical interaction?","answer":"A continuous-by-continuous interaction involves two continuous variables and examines how the slope of one variable changes with the level of another. A categorical-by-categorical interaction compares differences in means between groups represented by two categorical variables.","topic":"Moderation (Interaction Effects)"},{"question":"Why is it important to include interaction terms in regression models?","answer":"Including interaction terms in regression models allows for the examination of conditional relationships, providing insights into how the effect of one variable on the outcome changes depending on the level of another variable. This is crucial for understanding complex relationships in data.","topic":"Moderation (Interaction Effects)"},{"question":"Why do we use logistic regression instead of linear regression for binary dependent variables?","answer":"Logistic regression is used for binary dependent variables because it transforms the linear regression function into values within the range of 0 to 1 using a sigmoid function, forming an S-shaped curve. This ensures that predicted probabilities are valid (i.e., between 0 and 1), unlike linear regression which can predict values outside this range.","topic":"Logistic Regression"},{"question":"What is the formula for the logistic regression model?","answer":"The logistic regression model is expressed as Pr(Y=1|X=x) = e^(b0 + b1*X) / (1 + e^(b0 + b1*X)), where Pr(Y=1|X=x) is the probability of the dependent variable Y being 1 given the independent variable X.","topic":"Logistic Regression"},{"question":"How do you interpret the coefficients in a logistic regression model?","answer":"Coefficients in a logistic regression model are in log-odds. To interpret them, we use the exponential function Exp(\\u03b2), which gives us the odds ratio. A coefficient greater than 1 increases the odds of the outcome, while a coefficient less than 1 decreases the odds.","topic":"Logistic Regression"},{"question":"Provide an example of interpreting an odds ratio from a logistic regression model.","answer":"If the coefficient for 'Income' is 0.30, the odds ratio is Exp(0.30) = 1.35. This means that an increase of \\u20ac10,000 in income increases the odds of the outcome by 35%.","topic":"Logistic Regression"},{"question":"What is the significance of the S-curve in logistic regression?","answer":"The S-curve in logistic regression represents the sigmoid function that maps predicted values to probabilities between 0 and 1. This curve ensures that the model's predictions are valid probabilities, which is crucial for binary outcomes.","topic":"Logistic Regression"},{"question":"Explain the practical application of logistic regression in a business context.","answer":"In a business context, logistic regression can be used to predict whether a customer will buy a product (binary outcome: yes or no) based on factors like age, income, and previous purchase history. The model helps in targeting marketing efforts more effectively.","topic":"Logistic Regression"},{"question":"How does logistic regression handle different types of independent variables?","answer":"Logistic regression can handle any kind of independent variable, whether continuous or categorical. It models the probability of the binary outcome by transforming the linear combination of these variables using the logistic function.","topic":"Logistic Regression"},{"question":"What estimation method does logistic regression use, and why?","answer":"Logistic regression uses maximum likelihood estimation (MLE) because the errors are not constant, unlike in linear regression. MLE finds the parameter values that maximize the likelihood of observing the given set of data.","topic":"Logistic Regression"},{"question":"Write down the logistic regression equation and explain each component.","answer":"The logistic regression equation is Pr(Y=1|X=x) = e^(b0 + b1*X) / (1 + e^(b0 + b1*X)). Pr(Y=1|X=x) is the probability of Y being 1 given X, b0 is the intercept, b1 is the coefficient for the independent variable X, and e is the base of the natural logarithm.","topic":"Logistic Regression"},{"question":"What is the primary difference between classification and clustering?","answer":"Classification involves predicting the category of a given data point based on known labels, while clustering involves grouping data points into clusters based on data structure without prior labels.","topic":"Classification vs Clustering"},{"question":"How does Adler Mannheim use classification in their business problem?","answer":"Adler Mannheim uses classification to decide whether specific merchandise items should be recommended to fans by measuring similarities between fans and classifying items accordingly.","topic":"Classification vs Clustering"},{"question":"Can you provide an example of a classification problem?","answer":"An example of a classification problem is determining whether a customer's order should be flagged for manual review, using a yes/no label.","topic":"Classification vs Clustering"},{"question":"What is an example of a clustering problem?","answer":"An example of a clustering problem is discovering different types of customer segments within a dataset without predefined labels.","topic":"Classification vs Clustering"},{"question":"What is the role of labels in classification versus clustering?","answer":"In classification, labels are known and used to train the model to predict outcomes. In clustering, labels are unknown, and the goal is to discover natural groupings within the data.","topic":"Classification vs Clustering"},{"question":"What is the general process of creating classifiers?","answer":"The process involves collecting a dataset with known group memberships, splitting it into training and test sets, building a prediction model to accurately predict membership, and assessing the model's performance against chance or alternative models.","topic":"Classification vs Clustering"},{"question":"What are some common methods used in classification?","answer":"Common classification methods include K-Nearest Neighbors, Decision Trees/Random Forests, Rule Learning, Na\\u00efve Bayes, Support Vector Machines, and Artificial Neural Networks.","topic":"Classification vs Clustering"},{"question":"Why is logistic regression used in classification problems?","answer":"Logistic regression is used when the dependent variable is binary (0 or 1), allowing for the prediction of probabilities of class membership.","topic":"Classification vs Clustering"},{"question":"What is the k-nearest neighbors (KNN) algorithm used for?","answer":"K-nearest neighbors (KNN) is a non-parametric algorithm used for classification and regression tasks. It predicts the class or value of a target data point based on the majority class or average value of its k-nearest neighbors in the feature space.","topic":"K-Nearest Neighbors & Collaborative Filtering"},{"question":"How is Euclidean distance used in KNN?","answer":"Euclidean distance is used as a similarity metric in KNN to measure the distance between data points. It helps identify the k-nearest neighbors by calculating the straight-line distance between the target point and each point in the dataset.","topic":"K-Nearest Neighbors & Collaborative Filtering"},{"question":"Explain majority voting in the context of KNN.","answer":"Majority voting in KNN is a method used to determine the class of a target point by selecting the most common class among its k-nearest neighbors. The class with the highest number of votes is assigned to the target point.","topic":"K-Nearest Neighbors & Collaborative Filtering"},{"question":"How does collaborative filtering relate to KNN?","answer":"Collaborative filtering uses KNN to recommend products by analyzing user-item interactions. It identifies users with similar preferences (neighbors) and predicts whether a target user would like an item based on the preferences of these similar users.","topic":"K-Nearest Neighbors & Collaborative Filtering"},{"question":"How would you decide whether to recommend the 'Wallet' to Erik using KNN?","answer":"To recommend the 'Wallet' to Erik, calculate the Euclidean distance between Erik's purchase vector [1,0,1,?] and other users' vectors. Identify the k-nearest neighbors and use majority voting to decide if the 'Wallet' should be recommended.","topic":"K-Nearest Neighbors & Collaborative Filtering"},{"question":"What are some limitations of the KNN algorithm?","answer":"KNN can be computationally slow as it requires comparing the target point to all training examples. It also suffers from the cold start problem, needing data on new users to make accurate predictions. Additionally, results depend on the choice of proximity measure.","topic":"K-Nearest Neighbors & Collaborative Filtering"},{"question":"What practical business applications can KNN be used for?","answer":"KNN is used in various business applications such as product recommendations (e.g., Netflix, Amazon), customer segmentation, and fraud detection. It leverages user similarity to predict preferences and behaviors.","topic":"K-Nearest Neighbors & Collaborative Filtering"},{"question":"Describe the process of implementing KNN for product recommendations.","answer":"To implement KNN for product recommendations: 1) Define a similarity metric (e.g., Euclidean distance). 2) Identify the k most similar users to the target user. 3) Aggregate the outcomes of these neighbors using majority voting or averaging to make a recommendation.","topic":"K-Nearest Neighbors & Collaborative Filtering"},{"question":"What is a decision tree and how is it used in classification?","answer":"A decision tree is a model that predicts a categorical label by encoding decisions into a sequence of single-attribute splits. It is used to classify data by branching through these splits from the root to a leaf node, which provides the classification decision.","topic":"Decision Trees"},{"question":"How do you navigate a decision tree for an unseen record?","answer":"To classify an unseen record using a decision tree, start at the root node and follow the branches according to the attribute tests until you reach a leaf node. The leaf node will provide the classification decision.","topic":"Decision Trees"},{"question":"How can decision trees be applied to detect ticket fraud at Adler Mannheim?","answer":"Decision trees can classify transactions as potentially fraudulent based on attributes like bulk purchase and new account status. By learning from past labeled data, the tree can flag suspicious transactions for manual review.","topic":"Decision Trees"},{"question":"What is the CART algorithm and how does it construct a decision tree?","answer":"The CART algorithm constructs a decision tree by making binary splits that maximize the purity of resulting groups. It starts with all observations in one node, evaluates potential splits for purity, chooses the best split, and applies this recursively until nodes are pure or a stopping rule is reached.","topic":"Decision Trees"},{"question":"How is Gini impurity calculated and used in decision trees?","answer":"Gini impurity is calculated as 1 - sum(p_k^2) for each class k in a node, where p_k is the proportion of class k. It measures how mixed the classes are, with 0 being pure. In decision trees, splits are chosen to minimize the weighted average Gini impurity of child nodes.","topic":"Decision Trees"},{"question":"How do you interpret the output of a decision tree node in R?","answer":"In R, a decision tree node's output includes the predicted class, estimated probabilities for each class, and the share of observations in that node. Nodes are colored by predicted class, with darker colors indicating higher purity.","topic":"Decision Trees"},{"question":"What is the role of the 'control' parameter in the R 'rpart' function?","answer":"The 'control' parameter in the 'rpart' function specifies settings for tree growth, such as 'cp' (complexity parameter), which determines the minimum improvement needed at each node to continue splitting. A lower 'cp' allows for more splits, potentially leading to a more complex tree.","topic":"Decision Trees"},{"question":"What are the advantages and limitations of decision trees?","answer":"Decision trees are fast and interpretable for small datasets, providing accuracy comparable to other methods for low-dimensional data. However, they struggle with high-dimensional data and do not account for interactions between attributes.","topic":"Decision Trees"},{"question":"What are the three conditions for establishing causality?","answer":"The three conditions for establishing causality are: 1) Covariation of cause (X) and effect (Y), meaning changes in X are systematically associated with changes in Y; 2) Temporal precedence, where changes in X occur before changes in Y; 3) No rival explanation, ensuring no other factors account for the observed relationship.","topic":"Causality & A/B Testing"},{"question":"Provide an example of a rival explanation in causal inference.","answer":"A rival explanation could be a weather change that affects both ad impressions and purchases. For instance, fewer people outdoors due to bad weather might lead to more browsing and purchases, making it appear as if an ad campaign caused the increase in sales.","topic":"Causality & A/B Testing"},{"question":"What is the primary purpose of an A/B test in causal analytics?","answer":"The primary purpose of an A/B test is to determine the causal impact of a treatment by randomly assigning subjects to either a control group or a treatment group, then comparing the outcomes to assess the effect of the treatment.","topic":"Causality & A/B Testing"},{"question":"Why is randomization important in A/B testing?","answer":"Randomization is crucial in A/B testing because it ensures that any differences in outcomes between the control and treatment groups can be attributed to the treatment itself, rather than pre-existing differences between the groups.","topic":"Causality & A/B Testing"},{"question":"What are some common challenges that make A/B testing infeasible?","answer":"Common challenges include: 1) Inability to randomize due to policies or technical constraints; 2) Lack of time or budget for experimentation; 3) Ethical, legal, or reputational constraints; 4) Long-run effects that cannot be captured in short-term experiments; 5) External factors like competitor actions or regulatory changes.","topic":"Causality & A/B Testing"},{"question":"Explain the concept of temporal precedence with an example.","answer":"Temporal precedence means establishing that changes in the cause (X) occur before changes in the effect (Y). For example, if a company increases its marketing budget (X) and subsequently sees an increase in sales (Y), temporal precedence is established if the budget increase clearly happened before the sales increase.","topic":"Causality & A/B Testing"},{"question":"How can covariation between cause and effect be confirmed?","answer":"Covariation can be confirmed through statistical analysis that shows a systematic association between changes in the independent variable (X) and changes in the dependent variable (Y). For example, using regression analysis to demonstrate that increased advertising spend (X) is associated with increased sales (Y).","topic":"Causality & A/B Testing"},{"question":"What is a confounder, and how does it affect causal inference?","answer":"A confounder is a variable that influences both the independent variable and the outcome, potentially creating a spurious association. For instance, if both ice cream sales and drowning incidents increase in summer, temperature is a confounder affecting both, not ice cream sales causing drownings.","topic":"Causality & A/B Testing"},{"question":"What is the Difference-in-Differences (DiD) method?","answer":"Difference-in-Differences (DiD) is a quasi-experimental design used to estimate causal relationships. It compares the changes in outcomes over time between a treatment group, which receives an intervention, and a control group, which does not.","topic":"Difference-in-Differences"},{"question":"What is the parallel trends assumption in DiD?","answer":"The parallel trends assumption posits that, in the absence of treatment, the average outcomes for the treatment and control groups would have evolved similarly over time. This assumption is crucial for the validity of DiD estimates.","topic":"Difference-in-Differences"},{"question":"What are the five requirements for a valid DiD intervention?","answer":"The five requirements are: Exogeneity (intervention is driven by external forces), Compliance (affected units actually receive the intervention), Partial Exposure (some units are affected while others are not), Unanticipated (units do not expect the intervention), and No Spillover (intervention does not affect the control group).","topic":"Difference-in-Differences"},{"question":"How is the DiD regression model structured?","answer":"The DiD regression model is structured as: Y_i = \\u03b20 + \\u03b21*Treat_i + \\u03b22*After + \\u03b23*(Treat_i \\u00d7 After) + \\u03b5_i, where Treat is a binary variable indicating treatment group membership, and After is a binary variable indicating the post-treatment period.","topic":"Difference-in-Differences"},{"question":"What was the key finding of Card and Krueger's (1994) DiD study?","answer":"Card and Krueger (1994) found that the increase in New Jersey's minimum wage led to an increase of +2.76 in mean full-time-equivalent employment compared to Pennsylvania, which did not change its minimum wage.","topic":"Difference-in-Differences"},{"question":"How can you check for parallel trends in a DiD study?","answer":"To check for parallel trends, compare the pre-treatment trends of the treatment and control groups. If they are similar, the parallel trends assumption is likely satisfied. This can be done graphically or statistically by testing for differences in pre-treatment trends.","topic":"Difference-in-Differences"},{"question":"What is a potential violation of the parallel trends assumption in the Card and Krueger study?","answer":"A potential violation could occur if there were other economic changes or policies in New Jersey or Pennsylvania around the same time that differentially affected employment trends, independent of the minimum wage change.","topic":"Difference-in-Differences"},{"question":"How would you write a DiD regression equation for the Adler Mannheim case?","answer":"The regression equation for the Adler Mannheim case is: Ticket_Revenue_i = \\u03b20 + \\u03b21*Adler_i + \\u03b22*After + \\u03b23*(Adler_i \\u00d7 After) + \\u03b5_i, where Adler is a binary variable for Adler Mannheim games, and After indicates the period after the pricing change.","topic":"Difference-in-Differences"},{"question":"What is the difference between lift and acceleration in the context of DiD?","answer":"Lift refers to a permanent increase in the level of an outcome due to treatment, while acceleration means the outcome occurs earlier than it would have without treatment. Both have different implications for interpreting DiD results.","topic":"Difference-in-Differences"},{"question":"What is the multi-armed bandit problem?","answer":"The multi-armed bandit problem is a sequential decision-making problem where the goal is to maximize cumulative reward by choosing from a set of options (arms), each with an unknown reward distribution. It involves balancing exploration (trying new options) and exploitation (choosing the best-known option).","topic":"Reinforcement Learning & Thompson Sampling"},{"question":"How does Thompson Sampling work in the context of multi-armed bandits?","answer":"Thompson Sampling involves assuming a prior distribution for each arm, typically a Beta distribution. In each round, a sample is drawn from each arm's distribution, and the arm with the highest sample value is selected. After observing the reward, the distribution is updated by adjusting the parameters alpha and beta based on the reward received.","topic":"Reinforcement Learning & Thompson Sampling"},{"question":"What are the key differences between exploration and exploitation in multi-armed bandit strategies?","answer":"Exploration involves trying different arms to gather information about their reward distributions, while exploitation involves selecting the arm with the highest estimated reward to maximize immediate gain. Pure exploitation can lead to linear cumulative regret, as it may miss better options, while pure exploration also results in linear regret due to random selection.","topic":"Reinforcement Learning & Thompson Sampling"},{"question":"What is the role of the Beta distribution in Thompson Sampling?","answer":"In Thompson Sampling, the Beta distribution is used as a prior for modeling the probability of success for each arm. The parameters alpha and beta are updated based on observed rewards, allowing the algorithm to maintain a probabilistic estimate of each arm's effectiveness.","topic":"Reinforcement Learning & Thompson Sampling"},{"question":"How would you interpret the next step in a Thompson Sampling example using Beta charts?","answer":"In a Thompson Sampling example, the next step involves sampling from the Beta distribution of each arm to determine which arm to pull next. The arm with the highest sampled value is chosen, and its distribution is updated based on the observed reward. This process iteratively refines the estimates of each arm's reward potential.","topic":"Reinforcement Learning & Thompson Sampling"},{"question":"What are the practical applications of multi-armed bandits in business?","answer":"Multi-armed bandits are used in digital environments like e-commerce and online advertising to optimize decisions in real-time. They are effective in settings where conditions change frequently, allowing businesses to allocate resources to the best-performing options, such as ad creatives or pricing strategies, based on user behavior and performance metrics.","topic":"Reinforcement Learning & Thompson Sampling"},{"question":"What is a potential drawback of the Epsilon-Greedy strategy?","answer":"A drawback of the Epsilon-Greedy strategy is that it requires a fixed exploration probability (epsilon), which may not adapt well to changing environments. This can lead to suboptimal performance if the chosen epsilon is not suitable for the problem's dynamics, potentially resulting in either too much exploration or insufficient exploration.","topic":"Reinforcement Learning & Thompson Sampling"},{"question":"In the Adler Mannheim case, how is Thompson Sampling used to optimize ad performance?","answer":"In the Adler Mannheim case, Thompson Sampling is used to optimize ad performance by treating each ad type (action-focused, star close-up, family experience) as an arm. The algorithm samples from each ad's Beta distribution to decide which ad to show, updating the distribution based on whether the ad was clicked (reward = 1) or not (reward = 0).","topic":"Reinforcement Learning & Thompson Sampling"},{"question":"What is an artificial neural network (ANN)?","answer":"An artificial neural network (ANN) is a computational model inspired by the way biological neural networks in the brain process information. It consists of interconnected nodes (neurons) organized in layers: input, hidden, and output layers. Each connection (edge) represents the flow of data, with the hidden layers performing transformations on the input data to produce an output.","topic":"Artificial Neural Networks"},{"question":"How do biological neurons compare to artificial neurons?","answer":"Biological neurons are the fundamental units of the brain that receive sensory input, transform signals, and send them to other neurons or muscles. Similarly, artificial neurons receive input, transform it using a mathematical function, and produce an output. Both types of neurons are designed to process and transmit information, but artificial neurons do so using mathematical functions.","topic":"Artificial Neural Networks"},{"question":"What is deep learning and how does it relate to artificial neural networks?","answer":"Deep learning is a subset of machine learning that uses artificial neural networks with many layers (deep networks) to model complex patterns in data. It leverages the architecture of ANNs to perform tasks such as image and speech recognition, where traditional algorithms may struggle.","topic":"Artificial Neural Networks"},{"question":"What are the key components of an artificial neural network?","answer":"The key components of an artificial neural network include: 1) Input layer, which receives the data; 2) Hidden layers, which perform transformations and computations on the data; 3) Output layer, which produces the final result. Each layer consists of nodes (neurons) that are interconnected, allowing data to flow through the network.","topic":"Artificial Neural Networks"},{"question":"How does an artificial neuron process information?","answer":"An artificial neuron processes information by receiving input values, applying a mathematical function (activation function) to these inputs, and producing an output. The function often includes weights and biases that are adjusted during training to improve the model's accuracy.","topic":"Artificial Neural Networks"},{"question":"What is the role of hidden layers in an artificial neural network?","answer":"Hidden layers in an artificial neural network perform intermediate computations and transformations on the input data. They enable the network to learn complex patterns and representations by adjusting the weights and biases during the training process.","topic":"Artificial Neural Networks"},{"question":"Can you provide an example of a practical application of artificial neural networks?","answer":"A practical application of artificial neural networks is in image recognition, such as identifying objects in photographs. Companies like Adler Mannheim use ANNs to automate the analysis of large datasets, improving efficiency and accuracy in tasks like customer segmentation and predictive analytics.","topic":"Artificial Neural Networks"},{"question":"What is the significance of the activation function in an artificial neuron?","answer":"The activation function in an artificial neuron determines the output of the neuron given an input or set of inputs. It introduces non-linearity into the model, allowing the network to learn complex patterns. Common activation functions include ReLU, sigmoid, and tanh.","topic":"Artificial Neural Networks"},{"question":"How is training performed in an artificial neural network?","answer":"Training in an artificial neural network involves adjusting the weights and biases of the network to minimize the difference between the predicted output and the actual output. This is typically done using a process called backpropagation, combined with an optimization algorithm like gradient descent.","topic":"Artificial Neural Networks"}];
+
+let ALL_CARDS = FLASHCARD_DATA;
+let cards = [];
+let currentIndex = 0;
+let isFlipped = false;
+let mode = 'flashcard'; // 'flashcard' or 'quiz'
+let ratings = {}; // cardIndex -> 'easy'|'medium'|'hard'
+let activeTopic = null;
+
+function loadCards() {
+  loadUserCards(); // load custom edits from localStorage if any
+  cards = [...ALL_CARDS];
+  loadRatings();
+  buildTopicButtons();
+  renderCard();
+  updateStats();
+}
+
+function buildTopicButtons() {
+  const topics = [...new Set(ALL_CARDS.map(c => c.topic))];
+  const container = document.getElementById('topic-controls');
+  // All button
+  const allBtn = document.createElement('button');
+  allBtn.className = 'topic-btn active';
+  allBtn.textContent = `All (${ALL_CARDS.length})`;
+  allBtn.onclick = () => filterTopic(null);
+  container.appendChild(allBtn);
+  // Hard-only button
+  const hardBtn = document.createElement('button');
+  hardBtn.className = 'topic-btn';
+  hardBtn.id = 'filter-hard';
+  hardBtn.textContent = 'Hard Only';
+  hardBtn.onclick = () => filterByRating('hard');
+  container.appendChild(hardBtn);
+  // Unrated button
+  const unratedBtn = document.createElement('button');
+  unratedBtn.className = 'topic-btn';
+  unratedBtn.id = 'filter-unrated';
+  unratedBtn.textContent = 'Unrated';
+  unratedBtn.onclick = () => filterByRating('unrated');
+  container.appendChild(unratedBtn);
+  // Topic buttons
+  topics.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn';
+    const count = ALL_CARDS.filter(c => c.topic === t).length;
+    btn.textContent = `${t.split('&')[0].trim()} (${count})`;
+    btn.title = t;
+    btn.onclick = () => filterTopic(t);
+    container.appendChild(btn);
+  });
+  // Add Card button
+  const addBtn = document.createElement('button');
+  addBtn.className = 'topic-btn';
+  addBtn.textContent = '+ Add';
+  addBtn.style.borderColor = '#16a34a';
+  addBtn.style.color = '#4ade80';
+  addBtn.onclick = () => openEditModal(-1);
+  container.appendChild(addBtn);
+  // Manage button
+  const manageBtn = document.createElement('button');
+  manageBtn.className = 'topic-btn';
+  manageBtn.textContent = 'Manage';
+  manageBtn.style.borderColor = '#60a5fa';
+  manageBtn.style.color = '#60a5fa';
+  manageBtn.onclick = openManageModal;
+  container.appendChild(manageBtn);
+  // Mode toggle
+  const modeBtn = document.createElement('button');
+  modeBtn.className = 'mode-btn';
+  modeBtn.id = 'mode-toggle';
+  modeBtn.textContent = 'Quiz Mode';
+  modeBtn.onclick = toggleMode;
+  container.appendChild(modeBtn);
+}
+
+function filterTopic(topic) {
+  activeTopic = topic;
+  if (topic === null) {
+    cards = [...ALL_CARDS];
+  } else {
+    cards = ALL_CARDS.filter(c => c.topic === topic);
+  }
+  currentIndex = 0;
+  isFlipped = false;
+  updateTopicButtons();
+  renderCard();
+}
+
+function filterByRating(rating) {
+  activeTopic = rating;
+  if (rating === 'hard') {
+    cards = ALL_CARDS.filter((c, i) => ratings[getCardKey(c)] === 'hard');
+  } else if (rating === 'unrated') {
+    cards = ALL_CARDS.filter((c, i) => !ratings[getCardKey(c)]);
+  }
+  currentIndex = 0;
+  isFlipped = false;
+  updateTopicButtons();
+  renderCard();
+}
+
+function updateTopicButtons() {
+  document.querySelectorAll('.topic-btn').forEach(btn => btn.classList.remove('active'));
+  const btns = document.querySelectorAll('.topic-btn');
+  if (activeTopic === null) btns[0].classList.add('active');
+  else if (activeTopic === 'hard') document.getElementById('filter-hard').classList.add('active');
+  else if (activeTopic === 'unrated') document.getElementById('filter-unrated').classList.add('active');
+  else {
+    btns.forEach(btn => {
+      if (btn.title === activeTopic) btn.classList.add('active');
+    });
+  }
+}
+
+function getCardKey(card) {
+  return card.question.substring(0, 60);
+}
+
+function renderCard() {
+  if (cards.length === 0) {
+    document.getElementById('flashcard-container').style.display = 'none';
+    document.getElementById('confidence-buttons').style.display = 'none';
+    document.getElementById('card-counter').innerHTML = '<div class="empty-state"><h2>No cards here!</h2>All done or no matches.</div>';
+    return;
+  }
+  document.getElementById('flashcard-container').style.display = 'block';
+  const card = cards[currentIndex];
+  document.getElementById('card-question').textContent = card.question;
+  document.getElementById('card-answer').textContent = card.answer;
+  document.getElementById('card-topic').textContent = card.topic;
+  document.getElementById('card-topic-back').textContent = card.topic;
+  document.getElementById('card-counter').textContent = `${currentIndex + 1} / ${cards.length}`;
+  document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / cards.length) * 100}%`;
+
+  // Reset flip
+  document.getElementById('flashcard').classList.remove('flipped');
+  isFlipped = false;
+  document.getElementById('confidence-buttons').style.display = 'none';
+
+  // Quiz mode
+  if (mode === 'quiz') {
+    document.getElementById('quiz-input').style.display = 'block';
+    document.getElementById('quiz-submit').style.display = 'inline-block';
+    document.getElementById('quiz-input').value = '';
+    document.getElementById('quiz-feedback').classList.remove('show');
+    document.getElementById('flashcard-container').style.display = 'none';
+  } else {
+    document.getElementById('quiz-input').style.display = 'none';
+    document.getElementById('quiz-submit').style.display = 'none';
+    document.getElementById('quiz-feedback').classList.remove('show');
+    document.getElementById('flashcard-container').style.display = 'block';
+  }
+
+  // Show question in quiz mode
+  if (mode === 'quiz') {
+    document.getElementById('card-counter').innerHTML =
+      `<div style="font-size:1.2rem;color:#f1f5f9;margin-bottom:8px">${card.question}</div>` +
+      `<div style="font-size:0.8rem;color:#60a5fa">${card.topic}</div>` +
+      `<div style="font-size:0.85rem;color:#64748b;margin-top:4px">${currentIndex + 1} / ${cards.length}</div>`;
+  }
+
+  document.getElementById('prev-btn').disabled = currentIndex === 0;
+  document.getElementById('next-btn').disabled = currentIndex === cards.length - 1;
+
+  // Highlight card border by rating
+  const key = getCardKey(card);
+  const container = document.getElementById('flashcard-container');
+  container.className = 'flashcard-container';
+  if (ratings[key]) {
+    const front = document.querySelector('.card-front');
+    if (ratings[key] === 'easy') front.style.borderColor = '#16a34a';
+    else if (ratings[key] === 'medium') front.style.borderColor = '#d97706';
+    else if (ratings[key] === 'hard') front.style.borderColor = '#dc2626';
+  } else {
+    document.querySelector('.card-front').style.borderColor = '#475569';
+  }
+}
+
+function flipCard() {
+  if (cards.length === 0 || mode === 'quiz') return;
+  isFlipped = !isFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped');
+  if (isFlipped) {
+    document.getElementById('confidence-buttons').style.display = 'flex';
+  } else {
+    document.getElementById('confidence-buttons').style.display = 'none';
+  }
+}
+
+function nextCard() {
+  if (currentIndex < cards.length - 1) {
+    currentIndex++;
+    renderCard();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderCard();
+  }
+}
+
+function shuffleCards() {
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  currentIndex = 0;
+  renderCard();
+}
+
+function rateCard(rating) {
+  const card = cards[currentIndex];
+  const key = getCardKey(card);
+  ratings[key] = rating;
+  saveRatings();
+  updateStats();
+  // Auto-advance
+  if (currentIndex < cards.length - 1) {
+    setTimeout(() => nextCard(), 300);
+  } else {
+    renderCard();
+  }
+}
+
+function updateStats() {
+  const total = ALL_CARDS.length;
+  let easy = 0, medium = 0, hard = 0;
+  ALL_CARDS.forEach(c => {
+    const r = ratings[getCardKey(c)];
+    if (r === 'easy') easy++;
+    else if (r === 'medium') medium++;
+    else if (r === 'hard') hard++;
+  });
+  document.getElementById('total-count').textContent = `${total} cards`;
+  document.getElementById('easy-count').textContent = `Easy: ${easy}`;
+  document.getElementById('medium-count').textContent = `Medium: ${medium}`;
+  document.getElementById('hard-count').textContent = `Hard: ${hard}`;
+}
+
+function saveRatings() {
+  localStorage.setItem('dsb2-flashcard-ratings', JSON.stringify(ratings));
+}
+
+function loadRatings() {
+  const saved = localStorage.getItem('dsb2-flashcard-ratings');
+  if (saved) ratings = JSON.parse(saved);
+}
+
+function toggleMode() {
+  mode = mode === 'flashcard' ? 'quiz' : 'flashcard';
+  const btn = document.getElementById('mode-toggle');
+  btn.textContent = mode === 'flashcard' ? 'Quiz Mode' : 'Flashcard Mode';
+  btn.classList.toggle('active', mode === 'quiz');
+  renderCard();
+}
+
+function checkQuizAnswer() {
+  const card = cards[currentIndex];
+  const userAnswer = document.getElementById('quiz-input').value.trim();
+  if (!userAnswer) return;
+
+  const fb = document.getElementById('quiz-feedback');
+  fb.classList.add('show');
+
+  // Simple keyword matching
+  const answerWords = card.answer.toLowerCase().split(/\s+/);
+  const keyWords = answerWords.filter(w => w.length > 4);
+  const userWords = userAnswer.toLowerCase().split(/\s+/);
+  const matched = keyWords.filter(kw => userWords.some(uw => uw.includes(kw) || kw.includes(uw)));
+  const score = keyWords.length > 0 ? matched.length / keyWords.length : 0;
+
+  if (score > 0.5) {
+    fb.className = 'quiz-feedback show correct';
+    fb.innerHTML = `<h4>Good answer!</h4><strong>Model answer:</strong> ${card.answer}`;
+  } else {
+    fb.className = 'quiz-feedback show partial';
+    fb.innerHTML = `<h4>Review the model answer:</h4><strong>Model answer:</strong> ${card.answer}`;
+  }
+
+  // Show confidence buttons
+  document.getElementById('confidence-buttons').style.display = 'flex';
+}
+
+// ==================== CARD EDITOR ====================
+
+// On startup, load user edits from localStorage over the default data
+function loadUserCards() {
+  const saved = localStorage.getItem('dsb2-flashcard-custom');
+  if (saved) {
+    ALL_CARDS = JSON.parse(saved);
+  }
+}
+
+function saveUserCards() {
+  localStorage.setItem('dsb2-flashcard-custom', JSON.stringify(ALL_CARDS));
+}
+
+function getTopics() {
+  return [...new Set(ALL_CARDS.map(c => c.topic))].sort();
+}
+
+function populateTopicSelect() {
+  const sel = document.getElementById('edit-topic');
+  sel.innerHTML = '';
+  getTopics().forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    sel.appendChild(opt);
+  });
+}
+
+function openEditModal(index) {
+  populateTopicSelect();
+  const modal = document.getElementById('edit-modal');
+  document.getElementById('edit-card-index').value = index;
+  document.getElementById('edit-topic-custom').value = '';
+
+  if (index >= 0) {
+    // Edit existing
+    const card = ALL_CARDS[index];
+    document.getElementById('edit-modal-title').textContent = 'Edit Flashcard';
+    document.getElementById('edit-question').value = card.question;
+    document.getElementById('edit-answer').value = card.answer;
+    document.getElementById('edit-topic').value = card.topic;
+    document.getElementById('edit-delete-btn').style.display = 'inline-block';
+  } else {
+    // Add new
+    document.getElementById('edit-modal-title').textContent = 'Add New Flashcard';
+    document.getElementById('edit-question').value = '';
+    document.getElementById('edit-answer').value = '';
+    document.getElementById('edit-delete-btn').style.display = 'none';
+  }
+  modal.classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+function saveEditCard() {
+  const index = parseInt(document.getElementById('edit-card-index').value);
+  const customTopic = document.getElementById('edit-topic-custom').value.trim();
+  const topic = customTopic || document.getElementById('edit-topic').value;
+  const question = document.getElementById('edit-question').value.trim();
+  const answer = document.getElementById('edit-answer').value.trim();
+
+  if (!question || !answer || !topic) {
+    alert('Please fill in all fields (topic, question, answer).');
+    return;
+  }
+
+  if (index >= 0) {
+    // Update existing
+    ALL_CARDS[index] = { question, answer, topic };
+  } else {
+    // Add new
+    ALL_CARDS.push({ question, answer, topic });
+  }
+
+  saveUserCards();
+  closeEditModal();
+  rebuildApp();
+}
+
+function deleteEditCard() {
+  const index = parseInt(document.getElementById('edit-card-index').value);
+  if (index < 0) return;
+  if (!confirm('Delete this flashcard?')) return;
+  ALL_CARDS.splice(index, 1);
+  saveUserCards();
+  closeEditModal();
+  rebuildApp();
+}
+
+function editCurrentCard() {
+  if (cards.length === 0) return;
+  const card = cards[currentIndex];
+  const globalIndex = ALL_CARDS.indexOf(card);
+  openEditModal(globalIndex >= 0 ? globalIndex : -1);
+}
+
+// Manage modal
+function openManageModal() {
+  document.getElementById('manage-modal').classList.add('open');
+  document.getElementById('manage-search').value = '';
+  renderManageList();
+}
+
+function closeManageModal() {
+  document.getElementById('manage-modal').classList.remove('open');
+}
+
+function renderManageList() {
+  const query = (document.getElementById('manage-search').value || '').toLowerCase();
+  const container = document.getElementById('manage-list');
+  container.innerHTML = '';
+  ALL_CARDS.forEach((card, i) => {
+    if (query && !card.question.toLowerCase().includes(query) && !card.topic.toLowerCase().includes(query) && !card.answer.toLowerCase().includes(query)) return;
+    const div = document.createElement('div');
+    div.className = 'card-list-item';
+    div.innerHTML = `
+      <span class="card-list-q" title="${card.question}">${card.question}</span>
+      <span class="card-list-topic">${card.topic}</span>
+      <span class="card-list-actions">
+        <button class="edit-btn" onclick="closeManageModal(); openEditModal(${i})">Edit</button>
+        <button class="del-btn" onclick="deleteFromManage(${i})">Del</button>
+      </span>`;
+    container.appendChild(div);
+  });
+  if (container.children.length === 0) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:#64748b">No cards found</div>';
+  }
+}
+
+function deleteFromManage(index) {
+  if (!confirm('Delete this card?')) return;
+  ALL_CARDS.splice(index, 1);
+  saveUserCards();
+  renderManageList();
+  rebuildApp();
+}
+
+function exportCards() {
+  const blob = new Blob([JSON.stringify(ALL_CARDS, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flashcards_export.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importCards(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!Array.isArray(imported)) throw new Error('Not an array');
+      const valid = imported.every(c => c.question && c.answer && c.topic);
+      if (!valid) throw new Error('Cards must have question, answer, topic');
+      if (confirm(`Import ${imported.length} cards? This will REPLACE all current cards.`)) {
+        ALL_CARDS = imported;
+        saveUserCards();
+        rebuildApp();
+        closeManageModal();
+      }
+    } catch(err) {
+      alert('Invalid file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function resetToDefault() {
+  if (!confirm('Reset all cards to the original 94? Your edits will be lost.')) return;
+  localStorage.removeItem('dsb2-flashcard-custom');
+  ALL_CARDS = JSON.parse(JSON.stringify(FLASHCARD_DATA));
+  rebuildApp();
+  closeManageModal();
+}
+
+function rebuildApp() {
+  // Rebuild topic buttons and re-filter
+  document.getElementById('topic-controls').innerHTML = '';
+  cards = [...ALL_CARDS];
+  currentIndex = 0;
+  activeTopic = null;
+  buildTopicButtons();
+  renderCard();
+  updateStats();
+}
+
+// ==================== END CARD EDITOR ====================
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (document.querySelector('.modal-overlay.open')) return; // ignore when modal open
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  switch(e.key) {
+    case ' ':
+    case 'Enter':
+      e.preventDefault();
+      flipCard();
+      break;
+    case 'ArrowRight':
+      nextCard();
+      break;
+    case 'ArrowLeft':
+      prevCard();
+      break;
+    case '1':
+      if (isFlipped || mode === 'quiz') rateCard('hard');
+      break;
+    case '2':
+      if (isFlipped || mode === 'quiz') rateCard('medium');
+      break;
+    case '3':
+      if (isFlipped || mode === 'quiz') rateCard('easy');
+      break;
+    case 's':
+    case 'S':
+      shuffleCards();
+      break;
+  }
+});
+
+// Init
+loadCards();
+</script>
+</body>
+</html>
